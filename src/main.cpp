@@ -1,22 +1,27 @@
 #include <Arduino.h>
-#include "config/saveConfig.h"
-#include "wifi/setupWifi.h"
+#include "config/save_config.h"
+#include "wifi/setup_wifi.h"
 #include "client/helius.h"
-#include "crypto/keypair.h"
+#include "solana/helpers.h"
+#include "client/sign.h"
+#include "client/transfer.h"
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+
+  // rpc();
   
-  // saveConfig();
+  // save_config();
 
-  setupWifi();
+  setup_wifi();
 
-  getKeypairFromSeed();
+  // test_sign();
+
+  transfer();
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // call();
-  // delay(3000);
 }

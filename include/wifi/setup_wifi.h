@@ -1,0 +1,1 @@
+bool setup_wifi();

@@ -1,0 +1,22 @@
+{
+  "name": "solana",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "authors": [
+    {
+      "name": "Saicharan Pogul",
+      "email": "",
+      "url": ""
+    }
+  ],
+  "frameworks": ["arduino"],
+  "platforms": ["esp32"],
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {}
+}

@@ -3,17 +3,17 @@
 #include <FS.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
-#include <./config/saveConfig.h>
+#include "config/save_config.h"
 
 #define FILE_MODE_R "r"
 
 const unsigned long timeout = 10000; 
 
-bool setupWifi() {
+bool setup_wifi() {
   String ssid;
   String password;
 
-  getWifiConfig(&ssid, &password);
+  get_wifi_config(&ssid, &password);
 
   Serial.println("\n\n----- WiFi Setup -----");
   WiFi.begin(ssid, password);
