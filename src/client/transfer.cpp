@@ -9,26 +9,28 @@
 #include "solana/signer.h"
 #include <solana/base58.h>
 
-
-bool transfer() {
-  const char* devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
-  const char* mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
+bool transfer()
+{
+  const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
+  const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
 
   // Establish WiFi connection (code from previous snippet)
 
   // Make the REST API call
-  if (WiFi.status() == WL_CONNECTED) {
+  if (WiFi.status() == WL_CONNECTED)
+  {
     HTTPClient http;
     // http.begin(mainnetRPC);
     http.begin(devnetRPC);
     int get_latest_blockhash_req = http.POST("{\"id\":34,\"jsonrpc\":\"2.0\",\"method\":\"getLatestBlockhash\",\"params\":[{\"commitment\":\"processed\"}]}");
 
-    if (get_latest_blockhash_req > 0) {
+    if (get_latest_blockhash_req > 0)
+    {
       String payload = http.getString();
       // Serial.println(payload);  // Print raw response
 
       // Deserialize JSON data
-      DynamicJsonDocument doc(1024);  // Adjust capacity as needed
+      DynamicJsonDocument doc(1024); // Adjust capacity as needed
       deserializeJson(doc, payload);
 
       // Access parsed data
@@ -43,12 +45,12 @@ bool transfer() {
 
       Keypair kp = Keypair(config_secret_key);
       Signer signer = Signer(kp);
-      
+
       Serial.println("");
       Serial.print("Public Key: ");
-      Serial.println(kp.public_key.to_base58().c_str());
-      
-      String sender = String(kp.public_key.to_base58().c_str());
+      Serial.println(kp.public_key.toBase58().c_str());
+
+      String sender = String(kp.public_key.toBase58().c_str());
 
       String message = "{\"header\":{\"numRequiredSignatures\":1,\"numReadonlySignedAccounts\":0,\"numReadonlyUnsignedAccounts\":1},\"staticAccountKeys\":[\"" + sender + "\",\"11111111111111111111111111111111\"],\"recentBlockhash\":\"" + blockhash + "\",\"compiledInstructions\":[{\"programIdIndex\":1,\"accountKeyIndexes\":[0,0],\"data\":{\"type\":\"Buffer\",\"data\":[2,0,0,0,136,19,0,0,0,0,0,0]}}],\"addressTableLookups\":[]}";
 
@@ -56,14 +58,14 @@ bool transfer() {
       Serial.println("");
       Serial.print("Signature: ");
       Serial.println(signature.c_str());
-      
-      String send_transaction_data = "{\"signatures\":[\"" + signature + "\"],\"message\": "+ message +"}";
+
+      String send_transaction_data = "{\"signatures\":[\"" + signature + "\"],\"message\": " + message + "}";
 
       Serial.println("");
       Serial.print("Data: ");
       Serial.println(send_transaction_data);
 
-      String send_transaction_param = String(base58_encode(reinterpret_cast<const unsigned char*>(send_transaction_data.c_str()), send_transaction_data.length()).c_str());
+      String send_transaction_param = String(base58Encode(reinterpret_cast<const unsigned char *>(send_transaction_data.c_str()), send_transaction_data.length()).c_str());
 
       Serial.println("");
       Serial.print("Signed Transaction: ");
@@ -81,7 +83,8 @@ bool transfer() {
 
       int send_transaction_req = http.POST(req_data);
 
-      if (send_transaction_req > 0) {
+      if (send_transaction_req > 0)
+      {
         String send_transaction_payload = http.getString();
         Serial.println("");
         Serial.println(send_transaction_payload);
@@ -94,13 +97,16 @@ bool transfer() {
         Serial.println("");
         Serial.print("Sent Signature: ");
         Serial.println(signature.c_str());
-      } else {
+      }
+      else
+      {
         Serial.print("HTTP error: ");
         Serial.println(send_transaction_req);
         return false;
       }
-
-    } else {
+    }
+    else
+    {
       Serial.print("HTTP error: ");
       Serial.println(get_latest_blockhash_req);
       return false;

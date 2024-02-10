@@ -11,27 +11,31 @@
 
 constexpr std::size_t SECRET_KEY_LEN = 64;
 
-class Keypair {
-    private:
-        unsigned char secret_key[SECRET_KEY_LEN];
-        
-    public:
-        PublicKey public_key;
+class Keypair
+{
+private:
+    unsigned char secret_key[SECRET_KEY_LEN];
 
-        // Default constructor for zero-initialized keys
-        Keypair();
+public:
+    PublicKey public_key;
 
-        // Generate keypair from a secure seed
-        Keypair(const std::vector<unsigned char>& seed);
+    // Default constructor for zero-initialized keys
+    Keypair();
 
-        // Generate keypair from a secure seed (convenience for C arrays)
-        Keypair(const unsigned char seed[SECRET_KEY_LEN]);
+    // Generate keypair from a secure seed
+    Keypair(const std::vector<unsigned char> &seed);
 
-        // Access secret key with authorization
-        const unsigned char* get_secret_key();
+    // Generate keypair from a secure seed (convenience for C arrays)
+    Keypair(const unsigned char seed[SECRET_KEY_LEN]);
 
-        // Destructor to securely clear secret key
-        ~Keypair();
+    // Access secret key with authorization
+    const unsigned char *get_secret_key();
+
+    // Destructor to securely clear secret key
+    ~Keypair();
+
+    // Generate a new Keypair with a random seed
+    Keypair generate();
 };
 
 #endif // KEYPAIR_H
