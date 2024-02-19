@@ -1,5 +1,7 @@
-#include "Hash.h"
 #include <atomic>
+#include <sstream>
+#include <iomanip>
+#include "Hash.h"
 
 Hash::Hash()
 {
@@ -34,6 +36,28 @@ std::array<uint8_t, HASH_BYTES> Hash::toBytes() const
 }
 
 void Hash::sanitize() {}
+
+// Serialize method
+std::vector<uint8_t> Hash::serialize()
+{
+    std::vector<uint8_t> result(data.begin(), data.end());
+    return result;
+}
+
+// Deserialize method
+Hash Hash::deserialize(const std::vector<uint8_t> &input)
+{
+    if (input.size() != HASH_BYTES)
+    {
+        throw std::invalid_argument("Invalid hash string");
+    }
+    Hash hash;
+    for (size_t i = 0; i < HASH_BYTES; ++i)
+    {
+        hash.data[i] = input[i];
+    }
+    return hash;
+}
 
 void Hasher::hash(const uint8_t *val, size_t len)
 {

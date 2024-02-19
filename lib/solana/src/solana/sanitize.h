@@ -2,31 +2,40 @@
 #define SANITIZE_H
 
 #include <vector>
-#include <stdexcept>
 
-class SanitizeError : public std::exception {
+enum ErrorType
+{
+    IndexOutOfBounds,
+    ValueOutOfBounds,
+    InvalidValue
+};
+
+class SanitizeError
+{
 public:
-    enum ErrorType {
-        IndexOutOfBounds,
-        ValueOutOfBounds,
-        InvalidValue
-    };
+    SanitizeError(ErrorType error);
+    const char *what() const throw();
 
+private:
     ErrorType error;
-
-    const char* what() const throw();
 };
 
 template <typename T>
-class Sanitize {
+class Sanitize
+{
 public:
     virtual void sanitize();
 };
 
 template <typename T>
-class Vec : public std::vector<T>, public Sanitize<T> {
+class Vec : public Sanitize<T>
+{
 public:
-    void sanitize();
+    Vec(std::vector<T> vec);
+    void sanitize() override;
+
+private:
+    std::vector<T> vec;
 };
 
 #endif // SANITIZE_H

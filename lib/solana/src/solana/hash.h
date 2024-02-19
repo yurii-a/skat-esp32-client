@@ -22,6 +22,23 @@ public:
     static Hash newUnique();
     std::array<uint8_t, HASH_BYTES> toBytes() const;
     void sanitize();
+    std::vector<uint8_t> serialize();
+    static Hash deserialize(const std::vector<uint8_t> &input);
+
+    bool operator!=(const Hash &other) const
+    {
+        return data != other.data;
+    }
+
+    Hash operator+(const Hash &other) const
+    {
+        Hash result;
+        for (size_t i = 0; i < HASH_BYTES; i++)
+        {
+            result.data[i] = this->data[i] ^ other.data[i];
+        }
+        return result;
+    }
 };
 
 class Hasher

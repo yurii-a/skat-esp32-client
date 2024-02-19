@@ -8,6 +8,10 @@
 #include "solana/keypair.h"
 #include "solana/signer.h"
 #include <solana/base58.h>
+#include <solana/message.h>
+#include <solana/instruction.h>
+#include <solana/account_meta.h>
+#include <solana/programs/system_program.h>
 
 bool transfer()
 {
@@ -48,11 +52,48 @@ bool transfer()
 
       Serial.println("");
       Serial.print("Public Key: ");
-      Serial.println(kp.public_key.toBase58().c_str());
+      Serial.println(kp.publicKey.toBase58().c_str());
 
-      String sender = String(kp.public_key.toBase58().c_str());
+      String sender = String(kp.publicKey.toBase58().c_str());
 
       String message = "{\"header\":{\"numRequiredSignatures\":1,\"numReadonlySignedAccounts\":0,\"numReadonlyUnsignedAccounts\":1},\"staticAccountKeys\":[\"" + sender + "\",\"11111111111111111111111111111111\"],\"recentBlockhash\":\"" + blockhash + "\",\"compiledInstructions\":[{\"programIdIndex\":1,\"accountKeyIndexes\":[0,0],\"data\":{\"type\":\"Buffer\",\"data\":[2,0,0,0,136,19,0,0,0,0,0,0]}}],\"addressTableLookups\":[]}";
+
+      AccountMeta *user = AccountMeta::newWritable(signer.publicKey(), true);
+      Serial.println("1");
+      std::vector<uint8_t> transferData = {
+          0x02, 0x00, 0x00, 0x00, 0x80, 0xf0, 0xfa, 0x02, 0x00, 0x00, 0x00, 0x00};
+      Serial.println("2");
+
+      std::vector<AccountMeta> accounts = {*user};
+      Serial.println("ACCOUNT SIZE:");
+      Serial.println(accounts.size());
+      std::vector<uint8_t> accountBytes;
+      Serial.println("4");
+      for (auto &account : accounts)
+      {
+        Serial.println("LOOP");
+        Serial.println(account.isSigner);
+        auto serializedAccount = account.serialize();
+        accountBytes.insert(accountBytes.end(), serializedAccount.begin(), serializedAccount.end());
+      }
+      Serial.println("Account BYTES:");
+      Serial.println(accountBytes.size());
+
+      Instruction ix = Instruction::newWithBytes(
+          SystemProgram::id(), transferData,
+          accounts);
+      Serial.println("6");
+
+      std::vector<uint8_t> vec = ix.serialize();
+      Serial.println("7");
+      String str;
+      for (uint8_t byte : vec)
+      {
+        str += String(byte, HEX);
+      }
+      Serial.println("IX: " + str);
+
+      // Message msg = Message()
 
       String signature = String(signer.sign(std::string(message.c_str())).c_str());
       Serial.println("");

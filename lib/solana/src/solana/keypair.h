@@ -14,10 +14,10 @@ constexpr std::size_t SECRET_KEY_LEN = 64;
 class Keypair
 {
 private:
-    unsigned char secret_key[SECRET_KEY_LEN];
+    unsigned char secretKey[SECRET_KEY_LEN];
 
 public:
-    PublicKey public_key;
+    PublicKey publicKey;
 
     // Default constructor for zero-initialized keys
     Keypair();
@@ -29,7 +29,7 @@ public:
     Keypair(const unsigned char seed[SECRET_KEY_LEN]);
 
     // Access secret key with authorization
-    const unsigned char *get_secret_key();
+    const unsigned char *getSecretKey();
 
     // Destructor to securely clear secret key
     ~Keypair();

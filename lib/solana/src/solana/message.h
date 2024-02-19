@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <sstream>
 #include "./public_key.h"
 #include "./hash.h"
 #include "./instruction.h"
@@ -32,6 +33,8 @@ public:
 
   void sanitize();
 
+  Message();
+
   Message(MessageHeader header, std::vector<PublicKey> accountKeys, Hash recentBlockhash, std::vector<CompiledInstruction> instructions);
 
   Message(std::vector<Instruction> instructions, std::optional<PublicKey> payer);
@@ -54,7 +57,41 @@ public:
 
   CompiledInstruction compileInstruction(Instruction &ix);
 
-  
+  // TODO: Add serialize
+
+  std::optional<PublicKey *> programId(size_t instructionIndex);
+
+  std::optional<size_t> programIndex(size_t instruction_index);
+
+  std::vector<PublicKey *> programIds();
+
+  bool isKeyPassedToProgram(size_t keyIndex);
+
+  bool isKeyCalledAsProgram(size_t keyIndex);
+
+  bool isNonLoaderKey(size_t keyIndex);
+
+  std::optional<size_t> programPosition(size_t index);
+
+  bool maybeExecutable(size_t i);
+
+  bool demoteProgramId(size_t i);
+
+  bool isWritable(size_t i);
+
+  bool isSigner(size_t i);
+
+  std::vector<PublicKey *> signerKeys();
+
+  bool hasDuplicates();
+
+  bool isUpgradeableLoaderPresent();
+
+  static Hash hashRawMessage(std::vector<uint8_t> messageBytes);
+
+  std::vector<uint8_t> serialize();
+
+  static Message deserialize(const std::vector<uint8_t> &input);
 };
 
 #endif // MESSAGE_H

@@ -13,7 +13,7 @@ void test_sign()
   Signer signer = Signer(kp);
 
   Serial.print("Public Key: ");
-  Serial.println(kp.public_key.toBase58().c_str());
+  Serial.println(kp.publicKey.toBase58().c_str());
 
   std::string signature = signer.sign("hello");
   Serial.print("Signature: ");

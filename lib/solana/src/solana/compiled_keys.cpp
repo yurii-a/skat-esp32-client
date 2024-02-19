@@ -30,7 +30,7 @@ public:
 
     for (const Instruction &ix : instructions)
     {
-      CompiledKeyMeta &meta = keyMetaMap[ix.program_id];
+      CompiledKeyMeta &meta = keyMetaMap[ix.programId];
       meta.isInvoked = true;
 
       for (const AccountMeta &accountMeta : ix.accounts)

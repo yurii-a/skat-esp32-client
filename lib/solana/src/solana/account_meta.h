@@ -16,10 +16,14 @@ public:
   bool isWritable;
 
   // Construct metadata for a writable account.
-  static AccountMeta *newWritable(PublicKey public_key, bool is_signer);
+  static AccountMeta *newWritable(PublicKey publicKey, bool isSigner);
 
   // Construct metadata for a read-only account.
-  static AccountMeta *newReadonly(PublicKey public_key, bool is_signer);
+  static AccountMeta *newReadonly(PublicKey publicKey, bool isSigner);
+
+  std::vector<uint8_t> serialize();
+
+  static AccountMeta deserialize(const std::vector<uint8_t> &input);
 };
 
 #endif // ACCOUNT_META_H
