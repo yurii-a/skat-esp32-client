@@ -9,16 +9,16 @@ class BPFLoaderUpgradeable
 public:
   static PublicKey id()
   {
-    std::optional<PublicKey> pubkey = PublicKey::fromString("BPFLoaderUpgradeab1e11111111111111111111111");
+    // std::optional<PublicKey> pubkey = PublicKey::fromString("BPFLoaderUpgradeab1e11111111111111111111111");
 
-    if (pubkey.has_value())
-    {
-      return pubkey.value();
-    }
-    else
-    {
-      return PublicKey();
-    }
+    // if (pubkey.has_value())
+    // {
+    //   return pubkey.value();
+    // }
+    // else
+    // {
+    // }
+    return PublicKey();
   }
 };
 

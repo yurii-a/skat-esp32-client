@@ -10,10 +10,12 @@
 
 struct CompiledKeyMeta
 {
-  bool is_signer;
-  bool is_writable;
-  bool is_invoked;
+  bool isSigner = false;
+  bool isWritable = false;
+  bool isInvoked = false;
 };
+
+using CompileError = std::runtime_error;
 
 class CompiledKeys
 {
@@ -21,7 +23,7 @@ public:
   std::optional<PublicKey> payer;
   std::map<PublicKey, CompiledKeyMeta> keyMetaMap;
 
-  static CompiledKeys compile(const std::vector<Instruction> &instructions, const std::optional<PublicKey> &payer);
+  static CompiledKeys compile(std::vector<Instruction> &instructions, std::optional<PublicKey> &payer);
 
   std::pair<MessageHeader, std::vector<PublicKey>> tryIntoMessageComponents();
 };

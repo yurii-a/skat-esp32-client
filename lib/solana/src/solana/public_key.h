@@ -10,6 +10,8 @@
 
 const uint8_t PUBLIC_KEY_LEN = 32;
 
+const uint8_t PUBLIC_KEY_MAX_BASE58_LEN = 44;
+
 class ParsePubkeyError : public std::runtime_error
 {
 public:

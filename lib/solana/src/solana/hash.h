@@ -9,7 +9,7 @@
 // Size of hash in bytes
 constexpr size_t HASH_BYTES = 32;
 // Maximum string length of a base58 encoded hash.
-constexpr size_t MAX_BASE58_LEN = 44;
+constexpr size_t HASH_MAX_BASE58_LEN = 44;
 
 class Hash
 {
@@ -24,6 +24,7 @@ public:
     void sanitize();
     std::vector<uint8_t> serialize();
     static Hash deserialize(const std::vector<uint8_t> &input);
+    Hash fromString(const std::string &str);
 
     bool operator!=(const Hash &other) const
     {
@@ -38,6 +39,15 @@ public:
             result.data[i] = this->data[i] ^ other.data[i];
         }
         return result;
+    }
+
+    Hash &operator=(const Hash &other)
+    {
+        if (this != &other)
+        {
+            this->data = other.data;
+        }
+        return *this;
     }
 };
 

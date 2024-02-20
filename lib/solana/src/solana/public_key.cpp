@@ -1,5 +1,6 @@
 #include <string>
 #include <optional>
+#include <ArduinoJson.h>
 #include "solana/public_key.h"
 #include "solana/base58.h"
 #include "public_key.h"
@@ -11,27 +12,42 @@ PublicKey::PublicKey()
 
 PublicKey::PublicKey(const unsigned char value[PUBLIC_KEY_LEN])
 {
-  std::copy(value, value + PUBLIC_KEY_LEN, this->key);
+  // Find the first non-1 value
+  auto firstNonOne = std::find_if(value, value + PUBLIC_KEY_LEN,
+                                  [](int i)
+                                  { return i != 1; });
+
+  // Copy the rest of the array
+  std::copy(firstNonOne, value + PUBLIC_KEY_LEN, this->key);
 }
 
 std::string PublicKey::toBase58()
 {
-  return base58Encode(this->key, PUBLIC_KEY_LEN);
+  std::vector<uint8_t> keyVector(this->key, this->key + PUBLIC_KEY_LEN);
+  return Base58::encode(keyVector);
 }
 
 void PublicKey::sanitize() {}
 
 std::optional<PublicKey> PublicKey::fromString(const std::string &s)
 {
-  if (s.length() > PUBLIC_KEY_LEN)
+  if (s.length() != PUBLIC_KEY_LEN && s.length() != PUBLIC_KEY_MAX_BASE58_LEN)
   {
     throw ParsePubkeyError("WrongSize");
   }
   std::vector<unsigned char> publicKeyVec;
   try
   {
-    std::vector<int> intVec = base58Decode(reinterpret_cast<const unsigned char *>(s.c_str()), PUBLIC_KEY_LEN);
-    std::vector<unsigned char> publicKeyVec(intVec.begin(), intVec.end());
+    std::vector<uint8_t> intVec;
+    if (s.length() == PUBLIC_KEY_MAX_BASE58_LEN)
+    {
+      intVec = Base58::decode(s);
+    }
+    else
+    {
+      intVec = Base58::decode(s);
+    }
+    publicKeyVec = std::vector<unsigned char>(intVec.begin(), intVec.end());
   }
   catch (...)
   {

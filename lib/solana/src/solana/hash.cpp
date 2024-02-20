@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include "Hash.h"
+#include "solana/base58.h"
 
 Hash::Hash()
 {
@@ -10,7 +11,9 @@ Hash::Hash()
 
 Hash::Hash(std::array<uint8_t, HASH_BYTES> &hashArray)
 {
-    this->data = hashArray;
+    auto firstNonZero = std::find_if(hashArray.begin(), hashArray.end(), [](int i)
+                                     { return i != 0; });
+    std::copy(firstNonZero, hashArray.end(), this->data.begin());
 }
 
 // Constructor to initialize from an array
@@ -55,6 +58,39 @@ Hash Hash::deserialize(const std::vector<uint8_t> &input)
     for (size_t i = 0; i < HASH_BYTES; ++i)
     {
         hash.data[i] = input[i];
+    }
+    return hash;
+}
+
+// Method to create a Hash from a Base58 encoded string
+Hash Hash::fromString(const std::string &str)
+{
+    std::string s_trimmed = str.substr(str.find_first_not_of('1')); // Skip initial '1's
+    const unsigned char *uchar_str = reinterpret_cast<const unsigned char *>(s_trimmed.c_str());
+    std::vector<uint8_t> decoded;
+
+    if (s_trimmed.size() == HASH_MAX_BASE58_LEN)
+    {
+        decoded = Base58::decode(str);
+    }
+    else if (s_trimmed.size() == HASH_BYTES)
+    {
+        decoded = Base58::decode(str);
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid string length");
+    }
+
+    if (decoded.size() != HASH_BYTES)
+    {
+        throw std::invalid_argument("Invalid hash string");
+    }
+
+    Hash hash;
+    for (size_t i = 0; i < HASH_BYTES; ++i)
+    {
+        hash.data[i] = decoded[i];
     }
     return hash;
 }

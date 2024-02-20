@@ -33,7 +33,7 @@ public:
 
   void sanitize();
 
-  Message();
+  Message() = default;
 
   Message(MessageHeader header, std::vector<PublicKey> accountKeys, Hash recentBlockhash, std::vector<CompiledInstruction> instructions);
 

@@ -34,6 +34,8 @@ public:
 
     Signers() = default;
 
+    Signers(std::vector<Signer> &signers);
+
     std::vector<PublicKey> publicKeys();
 
     std::vector<Signature> signMessage(const std::vector<uint8_t> &message);

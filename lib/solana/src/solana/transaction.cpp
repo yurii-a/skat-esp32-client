@@ -144,6 +144,7 @@ Transaction Transaction::sign(Signers &keypairs, Hash recentBlockhash)
   {
     throw std::runtime_error("Transaction::sign failed with error " + std::string(e.what()));
   }
+  return *this;
 }
 
 // Sign the transaction with a subset of required keys.
@@ -234,8 +235,13 @@ bool Transaction::isSigned()
 {
   for (auto &signature : this->signatures)
   {
-    return signature != Signature();
+    if (signature != Signature())
+    {
+      return true;
+    }
   }
+
+  return false;
 }
 
 // Returns a signature that is not valid for signing this transaction.

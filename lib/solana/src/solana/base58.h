@@ -1,6 +1,22 @@
-#include <string>
+// Base58.h
+#ifndef BASE58_H
+#define BASE58_H
+
 #include <vector>
+#include <string>
 
-std::string base58Encode(const unsigned char *source, int len);
+class Base58
+{
+public:
+  Base58();
+  static void printArray(const std::vector<unsigned char> &arr);
+  static std::string encode(const std::vector<uint8_t> &input);
+  static std::vector<uint8_t> decode(const std::string &addr);
+  static std::string trimEncode(const std::vector<uint8_t> &input);
+  static std::vector<uint8_t> trimDecode(const std::string &addr);
 
-std::vector<int> base58Decode(const unsigned char *str, int len);
+private:
+  static const std::string ALPHABET;
+};
+
+#endif // BASE58_H

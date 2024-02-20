@@ -12,6 +12,7 @@
 #include <solana/instruction.h>
 #include <solana/account_meta.h>
 #include <solana/programs/system_program.h>
+#include <solana/transaction.h>
 
 bool transfer()
 {
@@ -59,33 +60,22 @@ bool transfer()
       String message = "{\"header\":{\"numRequiredSignatures\":1,\"numReadonlySignedAccounts\":0,\"numReadonlyUnsignedAccounts\":1},\"staticAccountKeys\":[\"" + sender + "\",\"11111111111111111111111111111111\"],\"recentBlockhash\":\"" + blockhash + "\",\"compiledInstructions\":[{\"programIdIndex\":1,\"accountKeyIndexes\":[0,0],\"data\":{\"type\":\"Buffer\",\"data\":[2,0,0,0,136,19,0,0,0,0,0,0]}}],\"addressTableLookups\":[]}";
 
       AccountMeta *user = AccountMeta::newWritable(signer.publicKey(), true);
-      Serial.println("1");
       std::vector<uint8_t> transferData = {
           0x02, 0x00, 0x00, 0x00, 0x80, 0xf0, 0xfa, 0x02, 0x00, 0x00, 0x00, 0x00};
-      Serial.println("2");
 
       std::vector<AccountMeta> accounts = {*user};
-      Serial.println("ACCOUNT SIZE:");
-      Serial.println(accounts.size());
       std::vector<uint8_t> accountBytes;
-      Serial.println("4");
       for (auto &account : accounts)
       {
-        Serial.println("LOOP");
-        Serial.println(account.isSigner);
         auto serializedAccount = account.serialize();
         accountBytes.insert(accountBytes.end(), serializedAccount.begin(), serializedAccount.end());
       }
-      Serial.println("Account BYTES:");
-      Serial.println(accountBytes.size());
 
       Instruction ix = Instruction::newWithBytes(
           SystemProgram::id(), transferData,
           accounts);
-      Serial.println("6");
 
       std::vector<uint8_t> vec = ix.serialize();
-      Serial.println("7");
       String str;
       for (uint8_t byte : vec)
       {
@@ -93,47 +83,70 @@ bool transfer()
       }
       Serial.println("IX: " + str);
 
-      // Message msg = Message()
+      std::vector<Instruction> ixs;
+      ixs.push_back(ix);
 
-      String signature = String(signer.sign(std::string(message.c_str())).c_str());
-      Serial.println("");
-      Serial.print("Signature: ");
-      Serial.println(signature.c_str());
+      std::optional<PublicKey> payer;
 
-      String send_transaction_data = "{\"signatures\":[\"" + signature + "\"],\"message\": " + message + "}";
+      payer = signer.publicKey();
 
-      Serial.println("");
-      Serial.print("Data: ");
-      Serial.println(send_transaction_data);
+      Base58::printArray(Base58::decode(blockhash.c_str()));
 
-      String send_transaction_param = String(base58Encode(reinterpret_cast<const unsigned char *>(send_transaction_data.c_str()), send_transaction_data.length()).c_str());
+      std::array<uint8_t, 32> blockhashArr = {0};
+      std::memcpy(blockhashArr.data(), blockhash.c_str(), std::strlen(blockhash.c_str()));
 
-      Serial.println("");
-      Serial.print("Signed Transaction: ");
-      Serial.println(send_transaction_param);
+      Message msg = Message::newWithBlockhash(ixs, payer, blockhashArr);
 
-      String req_data = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"sendTransaction\",\"params\":[\"" + send_transaction_param + "\"]}";
+      Transaction tx = Transaction(msg);
 
-      Serial.println("");
-      Serial.print("Transaction(base64): ");
-      Serial.println(base64::encode(send_transaction_data));
+      std::vector<Signer> signerVector;
+      signerVector.push_back(signer);
 
-      Serial.println("");
-      Serial.print("Sending Transaction: ");
-      Serial.println(req_data);
+      Signers signers(signerVector);
 
-      int send_transaction_req = http.POST(req_data);
+      tx.sign(signers, Hash::newFromArray(blockhashArr));
 
-      if (send_transaction_req > 0)
+      String signature = tx.signatures[0].toString().c_str();
+
+      std::vector<uint8_t> serializedMessage = tx.messageData();
+
+      std::string bs64Tx(serializedMessage.begin(), serializedMessage.end());
+
+      Serial.print("SERIALIZED TX: ");
+      Serial.println(bs64Tx.c_str());
+      Serial.println();
+
+      Serial.print("SIGNATURE: ");
+      Serial.println(signature);
+      Serial.println();
+
+      String sendTransactionData = "{\"signatures\":[\"" + signature + "\"],\"message\": " + message + "}";
+      Serial.println("\nData: " + sendTransactionData);
+
+      std::vector<uint8_t> sendTransactionDataVec(sendTransactionData.begin(), sendTransactionData.end());
+      std::string sendTransactionParam = Base58::trimEncode(sendTransactionDataVec);
+
+      Serial.println("\nSigned Transaction: " + String(sendTransactionParam.c_str()));
+      std::string ss(serializedMessage.begin(), serializedMessage.end());
+      String reqDataBase64 = base64::encode(ss.c_str());
+      Serial.println("\nTransaction(base64): " + reqDataBase64);
+
+      String reqData = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"sendTransaction\",\"params\":[\"" + String(sendTransactionParam.c_str()) + "\"]}";
+
+      Serial.println("\nSending Transaction: " + reqData);
+
+      int sendTransactionReq = http.POST(reqData);
+
+      if (sendTransactionReq > 0)
       {
-        String send_transaction_payload = http.getString();
+        String sendTransactionPayload = http.getString();
         Serial.println("");
-        Serial.println(send_transaction_payload);
-        DynamicJsonDocument send_transaction_doc(1024);
-        deserializeJson(send_transaction_doc, send_transaction_payload);
+        Serial.println(sendTransactionPayload);
+        DynamicJsonDocument sendTransactionDoc(1024);
+        deserializeJson(sendTransactionDoc, sendTransactionPayload);
 
         // Access parsed data
-        String signature = send_transaction_doc["result"];
+        String signature = sendTransactionDoc["result"];
 
         Serial.println("");
         Serial.print("Sent Signature: ");
@@ -142,7 +155,7 @@ bool transfer()
       else
       {
         Serial.print("HTTP error: ");
-        Serial.println(send_transaction_req);
+        Serial.println(sendTransactionReq);
         return false;
       }
     }

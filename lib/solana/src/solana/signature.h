@@ -9,7 +9,10 @@
 #include "./keypair.h"
 #include "./public_key.h"
 
+// Number of bytes in a signature
 constexpr size_t SIGNATURE_BYTES = 64;
+
+// Maximum string length of a base58 encoded signature
 constexpr size_t MAX_BASE58_SIGNATURE_LEN = 88;
 
 class Signature
@@ -17,12 +20,12 @@ class Signature
 public:
     std::array<uint8_t, SIGNATURE_BYTES> value;
 
-    Signature();
-    Signature(const std::vector<uint8_t> &signature_slice);
-    static Signature new_unique();
-    bool verify(const std::vector<uint8_t> &pubkey_bytes, const std::vector<uint8_t> &message_bytes);
-    std::string to_string() const;
-    static Signature from_string(const std::string &s);
+    Signature() = default;
+    Signature(const std::vector<uint8_t> &signatureSlice);
+    static Signature newUnique();
+    void verify(const std::vector<uint8_t> &pubkeyBytes, const std::vector<uint8_t> &message_bytes);
+    std::string toString() const;
+    static Signature fromString(const std::string &s);
 
     uint8_t operator*() const
     {
@@ -33,6 +36,9 @@ public:
     {
         return value != other.value;
     }
+
+private:
+    void verifyVerbose(const std::vector<uint8_t> &publicKeyBytes, const std::vector<uint8_t> &messageBytes);
 };
 
 std::ostream &operator<<(std::ostream &os, const Signature &signature);

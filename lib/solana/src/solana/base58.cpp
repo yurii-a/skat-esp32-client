@@ -1,346 +1,77 @@
-#include <string>
-#include <vector>
+// Base58.cpp
+#include "Base58.h"
+#include <Arduino.h>
+#include <iostream>
+#include <iomanip>
 
-const char *const ALPHABET =
-    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-const signed char ALPHABET_MAP[256] = {
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    -1,
-    17,
-    18,
-    19,
-    20,
-    21,
-    -1,
-    22,
-    23,
-    24,
-    25,
-    26,
-    27,
-    28,
-    29,
-    30,
-    31,
-    32,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    33,
-    34,
-    35,
-    36,
-    37,
-    38,
-    39,
-    40,
-    41,
-    42,
-    43,
-    -1,
-    44,
-    45,
-    46,
-    47,
-    48,
-    49,
-    50,
-    51,
-    52,
-    53,
-    54,
-    55,
-    56,
-    57,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-};
+const std::string Base58::ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-const double iFactor = 1.36565823730976103695740418120764243208481439700722980119458355862779176747360903943915516885072037696111192757109;
+Base58::Base58() {}
 
-std::string base58Encode(const unsigned char *source, int len)
+void Base58::printArray(const std::vector<unsigned char> &arr)
 {
-    int zeros = 0, length = 0, pbegin = 0, pend;
-    if (!(pend = len))
-        return "";
-    while (pbegin != pend && !source[pbegin])
-        pbegin = ++zeros;
-    int size = 1 + iFactor * (double)(pend - pbegin);
-    unsigned char b58[size];
-    for (int i = 0; i < size; i++)
-        b58[i] = 0;
-    while (pbegin != pend)
+    for (const auto &el : arr)
     {
-        unsigned int carry = source[pbegin];
-        int i = 0;
-        for (int it1 = size - 1; (carry || i < length) && (it1 != -1); it1--, i++)
-        {
-            carry += 256 * b58[it1];
-            b58[it1] = carry % 58;
-            carry /= 58;
-        }
-        if (carry)
-            return "";
-        length = i;
-        pbegin++;
+        Serial.print(static_cast<int>(el));
+        Serial.print(" ");
     }
-    int it2 = size - length;
-    while ((it2 - size) && !b58[it2])
-        it2++;
-    std::string result(zeros + size - it2 + 1, '\0');
-    int ri = 0;
-    while (ri < zeros)
-        result[ri++] = '1';
-    for (; it2 < size; ++it2)
-        result[ri++] = ALPHABET[b58[it2]];
-    result[ri] = '\0';
-    return result;
+    Serial.println();
 }
 
-std::vector<int> base58Decode(const unsigned char *str, int len)
+std::string Base58::encode(const std::vector<uint8_t> &input)
 {
-    std::vector<int> result;
-    result.push_back(0);
-
-    for (int i = 0; i < len; i++)
+    std::vector<char> output(input.size() * 2, 0);
+    int c, tmp;
+    for (const auto &in : input)
     {
-        unsigned int carry = (unsigned int)ALPHABET_MAP[str[i]];
-        if (carry == -1)
+        c = in;
+        for (int j = output.size() - 1; j >= 0; --j)
         {
-            // Return an empty vector on error
-            return std::vector<int>();
-        }
-
-        for (int j = 0; j < result.size(); j++)
-        {
-            carry += (unsigned int)(result[j]) * 58;
-            result[j] = carry % 256;
-            carry /= 256;
-        }
-
-        while (carry > 0)
-        {
-            result.push_back(carry % 256);
-            carry /= 256;
+            tmp = output[j] * 256 + c;
+            c = tmp / 58;
+            output[j] = tmp % 58;
         }
     }
-
-    for (int i = 0; i < len && str[i] == '1'; i++)
-        result.push_back(0);
-
-    for (int i = result.size() - 1, z = (result.size() >> 1) + (result.size() & 1);
-         i >= z; i--)
+    for (auto &out : output)
     {
-        int k = result[i];
-        result[i] = result[result.size() - i - 1];
-        result[result.size() - i - 1] = k;
+        out = ALPHABET[out];
     }
+    return std::string(output.begin(), output.end());
+}
 
-    return result;
+std::vector<uint8_t> Base58::decode(const std::string &addr)
+{
+    std::vector<uint8_t> buf(addr.size(), 0);
+    int c, tmp;
+    for (const auto &a : addr)
+    {
+        c = ALPHABET.find(a);
+        for (int j = buf.size() - 1; j >= 0; --j)
+        {
+            tmp = buf[j] * 58 + c;
+            c = (tmp & (~0xff)) >> 8;
+            buf[j] = tmp & 0xff;
+        }
+    }
+    return buf;
+}
+
+std::string Base58::trimEncode(const std::vector<uint8_t> &input)
+{
+    std::string encoded = encode(input);
+    size_t first = encoded.find_first_not_of('1');
+    if (std::string::npos == first)
+    {
+        return "";
+    }
+    size_t last = encoded.find_last_not_of('1');
+    return encoded.substr(first, (last - first + 1));
+}
+
+std::vector<uint8_t> Base58::trimDecode(const std::string &addr)
+{
+    std::vector<uint8_t> decoded = decode(addr);
+    auto start = std::find_if(decoded.begin(), decoded.end(), [](int i)
+                              { return i != 0; });
+    return std::vector<uint8_t>(start, decoded.end());
 }
