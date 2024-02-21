@@ -120,6 +120,17 @@ public:
         }
         return is;
     }
+
+    // Addition operator
+    PublicKey operator+(const PublicKey &other) const
+    {
+        PublicKey result;
+        for (int i = 0; i < PUBLIC_KEY_LEN; ++i)
+        {
+            result.key[i] = this->key[i] + other.key[i];
+        }
+        return result;
+    }
 };
 
 #endif // PUBLIC_KEY_H

@@ -311,3 +311,50 @@ std::vector<bool> Transaction::_verifyWithResults(const std::vector<uint8_t> &me
   }
   return results;
 }
+
+// Serialize method
+std::vector<uint8_t> Transaction::serialize()
+{
+  std::vector<uint8_t> serializedTransaction;
+
+  // Serialize message
+  std::vector<uint8_t> serializedMessage = this->message.serialize();
+  serializedTransaction.insert(serializedTransaction.end(), serializedMessage.begin(), serializedMessage.end());
+
+  // Serialize signatures length
+  uint8_t numSignatures = static_cast<uint8_t>(this->signatures.size());
+  serializedTransaction.push_back(numSignatures);
+
+  // Serialize each signature
+  for (auto signature : this->signatures)
+  {
+    std::vector<uint8_t> serializedSignature = signature.serialize();
+    serializedTransaction.insert(serializedTransaction.end(), serializedSignature.begin(), serializedSignature.end());
+  }
+
+  return serializedTransaction;
+}
+
+// Deserialize method
+Transaction Transaction::deserialize(const std::vector<uint8_t> &data)
+{
+  size_t index = 0;
+
+  // Deserialize message
+  Message message = Message::deserialize(data);
+
+  // Deserialize signatures length
+  uint8_t numSignatures = data[index++];
+
+  // Deserialize signatures
+  std::vector<Signature> signatures;
+  for (int i = 0; i < numSignatures; ++i)
+  {
+    Signature signature = Signature::deserialize(data);
+    signatures.push_back(signature);
+  }
+
+  // TODO: Add Signatures Constructor
+
+  return Transaction(message);
+}

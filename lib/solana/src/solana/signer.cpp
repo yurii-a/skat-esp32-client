@@ -59,7 +59,9 @@ std::vector<Signature> Signers::signMessage(const std::vector<uint8_t> &message)
   std::vector<Signature> signatures;
   for (auto signer : this->signers)
   {
-    signatures.push_back(signer.signMessage(message));
+    Signature sig = signer.signMessage(message);
+    sig.verify(signer.publicKey().serialize(), message);
+    signatures.push_back(sig);
   }
   return signatures;
 }

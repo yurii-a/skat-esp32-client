@@ -71,6 +71,10 @@ public:
 
   std::vector<bool> verifyWithResults();
 
+  std::vector<uint8_t> serialize();
+
+  static Transaction deserialize(const std::vector<uint8_t> &data);
+
 private:
   std::vector<bool> _verifyWithResults(const std::vector<uint8_t> &messageBytes);
 

@@ -16,6 +16,32 @@ Hash::Hash(std::array<uint8_t, HASH_BYTES> &hashArray)
     std::copy(firstNonZero, hashArray.end(), this->data.begin());
 }
 
+Hash::Hash(const std::vector<uint8_t> &hashSlice)
+{
+    if (hashSlice.size() != HASH_BYTES && hashSlice.size() != HASH_MAX_BASE58_LEN)
+    {
+        throw std::runtime_error("Invalid vector size");
+    }
+    auto firstNonZero = std::find_if(hashSlice.begin(), hashSlice.end(), [](uint8_t i)
+                                     { return i != 0; });
+
+    if (firstNonZero == hashSlice.end())
+    {
+        // All elements in the hash are zero
+        std::copy(hashSlice.begin(), hashSlice.end(), this->data.begin());
+    }
+    else if (std::distance(firstNonZero, hashSlice.end()) != HASH_BYTES)
+    {
+        // Hash size is not HASH_BYTES after the first non-zero element
+        throw std::runtime_error("Invalid hash size");
+    }
+    else
+    {
+        // Copy the hash starting from the first non-zero element
+        std::copy(firstNonZero, hashSlice.end(), this->data.begin());
+    }
+}
+
 // Constructor to initialize from an array
 Hash Hash::newFromArray(std::array<uint8_t, HASH_BYTES> hashArray)
 {

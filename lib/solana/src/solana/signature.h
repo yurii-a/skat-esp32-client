@@ -6,6 +6,7 @@
 #include <array>
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 #include "./keypair.h"
 #include "./public_key.h"
 
@@ -26,6 +27,8 @@ public:
     void verify(const std::vector<uint8_t> &pubkeyBytes, const std::vector<uint8_t> &message_bytes);
     std::string toString() const;
     static Signature fromString(const std::string &s);
+    std::vector<uint8_t> serialize();
+    static Signature deserialize(const std::vector<uint8_t> &signatureSlice);
 
     uint8_t operator*() const
     {
@@ -35,6 +38,25 @@ public:
     bool operator!=(const Signature &other) const
     {
         return value != other.value;
+    }
+
+    Signature operator+(const Signature &other) const
+    {
+        Signature result;
+        for (int i = 0; i < SIGNATURE_BYTES; i++)
+        {
+            result.value[i] = this->value[i] + other.value[i];
+        }
+        return result;
+    }
+
+    Signature operator=(const Signature &other)
+    {
+        if (this != &other)
+        {
+            std::copy(other.value.begin(), other.value.end(), value.begin());
+        }
+        return *this;
     }
 
 private:
