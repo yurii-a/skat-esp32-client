@@ -326,10 +326,9 @@ std::vector<uint8_t> Message::serialize()
   result.push_back(header.numReadonlyUnsignedAccounts);
 
   // Serialize accountKeys
-  for (auto key : accountKeys)
+  for (auto publicKey : accountKeys)
   {
-    auto keyBytes = key.serialize();
-    result.insert(result.end(), keyBytes.begin(), keyBytes.end());
+    result.insert(result.end(), publicKey.key, publicKey.key + PUBLIC_KEY_LEN);
   }
 
   // Serialize recentBlockhash
@@ -342,7 +341,6 @@ std::vector<uint8_t> Message::serialize()
     auto instructionBytes = instruction.serialize();
     result.insert(result.end(), instructionBytes.begin(), instructionBytes.end());
   }
-
   return result;
 }
 

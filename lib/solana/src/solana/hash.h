@@ -18,6 +18,7 @@ public:
 
     Hash();
     Hash(std::array<uint8_t, HASH_BYTES> &hashArray);
+    Hash(const std::vector<uint8_t> &vec);
     static Hash newFromArray(std::array<uint8_t, HASH_BYTES> hashArray);
     static Hash newUnique();
     std::array<uint8_t, HASH_BYTES> toBytes() const;

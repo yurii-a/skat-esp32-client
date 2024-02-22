@@ -70,6 +70,7 @@
     "chrono": "cpp",
     "condition_variable": "cpp",
     "thread": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "regex": "cpp"
   }
 }

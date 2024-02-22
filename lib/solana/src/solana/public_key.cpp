@@ -24,7 +24,8 @@ PublicKey::PublicKey(const unsigned char value[PUBLIC_KEY_LEN])
 std::string PublicKey::toBase58()
 {
   std::vector<uint8_t> keyVector(this->key, this->key + PUBLIC_KEY_LEN);
-  return Base58::encode(keyVector);
+  // TODO: wrong size check this
+  return Base58::trimEncode(keyVector);
 }
 
 void PublicKey::sanitize() {}
@@ -63,8 +64,8 @@ std::optional<PublicKey> PublicKey::fromString(const std::string &s)
 // Serialize method
 std::vector<uint8_t> PublicKey::serialize()
 {
-  std::string str = this->toBase58();
-  std::vector<uint8_t> vec(str.begin(), str.end());
+  std::vector<uint8_t> vec;
+  vec.insert(vec.end(), this->key, this->key + PUBLIC_KEY_LEN);
   return vec;
 }
 

@@ -12,7 +12,6 @@
 // Create a new instruction from a byte slice.
 Instruction Instruction::newWithBytes(PublicKey programId, std::vector<uint8_t> &data, std::vector<AccountMeta> accounts)
 {
-    Serial.println("new with bytes");
     return {
         programId,
         accounts,

@@ -13,14 +13,20 @@
 
 Signature::Signature(const std::vector<uint8_t> &signatureSlice)
 {
+    // Find the first non-zero byte
     auto first_non_zero = std::find_if(signatureSlice.begin(), signatureSlice.end(), [](int byte)
-                                       { return byte != 0; });               // Find first non-zero byte
-    std::vector<uint8_t> trimmedSlice(first_non_zero, signatureSlice.end()); // Create a new vector without the initial zeros
+                                       { return byte != 0; });
 
+    // Create a new vector without the initial zeros
+    std::vector<uint8_t> trimmedSlice(first_non_zero, signatureSlice.end());
+
+    // Check if the size of the trimmed signature is correct
     if (trimmedSlice.size() != SIGNATURE_BYTES)
     {
         throw std::invalid_argument("Wrong size for signature");
     }
+
+    // Copy the trimmed signature to the value member
     std::copy(trimmedSlice.begin(), trimmedSlice.end(), value.begin());
 }
 
@@ -67,6 +73,24 @@ void Signature::verifyVerbose(const std::vector<uint8_t> &publicKeyBytes, const 
     {
         throw std::runtime_error("Signature verify failed");
     }
+}
+
+std::vector<uint8_t> Signature::serialize()
+{
+    std::vector<uint8_t> result(this->value.size());
+    std::copy(this->value.begin(), this->value.end(), result.begin());
+    return result;
+}
+
+Signature Signature::deserialize(const std::vector<uint8_t> &signatureSlice)
+{
+    Signature signature;
+    if (signatureSlice.size() != SIGNATURE_BYTES)
+    {
+        throw std::invalid_argument("Invalid size for signature");
+    }
+    std::copy(signatureSlice.begin(), signatureSlice.end(), signature.value.begin());
+    return signature;
 }
 
 std::ostream &operator<<(std::ostream &os, const Signature &signature)

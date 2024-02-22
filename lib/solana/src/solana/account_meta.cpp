@@ -37,14 +37,15 @@ std::vector<uint8_t> AccountMeta::serialize()
 // Deserialize the AccountMeta object from a vector of bytes
 AccountMeta AccountMeta::deserialize(const std::vector<uint8_t> &input)
 {
-    if (input.size() < sizeof(PublicKey) + 2)
+    if (input.size() < PUBLIC_KEY_LEN + 2)
     {
         throw std::runtime_error("Invalid input vector for deserialization");
     }
     AccountMeta accountMeta;
-    auto publicKeyBytes = std::vector<uint8_t>(input.begin(), input.begin() + sizeof(PublicKey));
+    std::vector<uint8_t> publicKeyBytes(input.begin(), input.begin() + PUBLIC_KEY_LEN);
+
     accountMeta.publicKey = PublicKey::deserialize(publicKeyBytes);
-    accountMeta.isSigner = input[sizeof(PublicKey)];
-    accountMeta.isWritable = input[sizeof(PublicKey) + 1];
+    accountMeta.isSigner = input[PUBLIC_KEY_LEN];
+    accountMeta.isWritable = input[PUBLIC_KEY_LEN + 1];
     return accountMeta;
 }
