@@ -21,6 +21,15 @@ PublicKey::PublicKey(const unsigned char value[PUBLIC_KEY_LEN])
   std::copy(firstNonOne, value + PUBLIC_KEY_LEN, this->key);
 }
 
+PublicKey::PublicKey(const std::vector<uint8_t> &value)
+{
+  auto firstNonOne = std::find_if(value.begin(), value.end(),
+                                  [](uint8_t i)
+                                  { return i != 1; });
+
+  std::copy(firstNonOne, value.end(), this->key);
+}
+
 std::string PublicKey::toBase58()
 {
   std::vector<uint8_t> keyVector(this->key, this->key + PUBLIC_KEY_LEN);
@@ -82,4 +91,17 @@ PublicKey PublicKey::deserialize(const std::vector<uint8_t> &data)
   {
     throw ParsePubkeyError("Invalid");
   }
+}
+
+void PublicKey::print() const
+{
+  for (size_t i = 0; i < PUBLIC_KEY_LEN; ++i)
+  {
+    Serial.print(this->key[i]);
+    if (i < PUBLIC_KEY_LEN - 1)
+    {
+      Serial.print(",");
+    }
+  }
+  Serial.println();
 }

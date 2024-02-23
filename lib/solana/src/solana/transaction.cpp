@@ -317,10 +317,6 @@ std::vector<uint8_t> Transaction::serialize()
 {
   std::vector<uint8_t> serializedTransaction;
 
-  // Serialize message
-  std::vector<uint8_t> serializedMessage = this->message.serialize();
-  serializedTransaction.insert(serializedTransaction.end(), serializedMessage.begin(), serializedMessage.end());
-
   // Serialize signatures length
   uint8_t numSignatures = static_cast<uint8_t>(this->signatures.size());
   serializedTransaction.push_back(numSignatures);
@@ -331,6 +327,10 @@ std::vector<uint8_t> Transaction::serialize()
     std::vector<uint8_t> serializedSignature = signature.serialize();
     serializedTransaction.insert(serializedTransaction.end(), serializedSignature.begin(), serializedSignature.end());
   }
+
+  // Serialize message
+  std::vector<uint8_t> serializedMessage = this->message.serialize();
+  serializedTransaction.insert(serializedTransaction.end(), serializedMessage.begin(), serializedMessage.end());
 
   return serializedTransaction;
 }

@@ -325,6 +325,10 @@ std::vector<uint8_t> Message::serialize()
   result.push_back(header.numReadonlySignedAccounts);
   result.push_back(header.numReadonlyUnsignedAccounts);
 
+  // Serialize number of accounts
+  uint8_t numAccounts = static_cast<uint8_t>(accountKeys.size());
+  result.push_back(numAccounts);
+
   // Serialize accountKeys
   for (auto publicKey : accountKeys)
   {
@@ -334,6 +338,10 @@ std::vector<uint8_t> Message::serialize()
   // Serialize recentBlockhash
   auto recentBlockhashBytes = this->recentBlockhash.serialize();
   result.insert(result.end(), recentBlockhashBytes.begin(), recentBlockhashBytes.end());
+
+  // Serialize number of instructions
+  uint8_t numInstructions = static_cast<uint8_t>(instructions.size());
+  result.push_back(numInstructions);
 
   // Serialize instructions
   for (auto instruction : instructions)

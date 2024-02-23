@@ -30,6 +30,8 @@ public:
     // Parameterized constructor
     PublicKey(const unsigned char value[PUBLIC_KEY_LEN]);
 
+    PublicKey(const std::vector<uint8_t> &value);
+
     // Convert key to base58
     std::string toBase58();
 
@@ -41,6 +43,8 @@ public:
     std::vector<uint8_t> serialize();
 
     static PublicKey deserialize(const std::vector<uint8_t> &data);
+
+    void print() const;
 
     // Less-than operator
     bool operator<(const PublicKey &other) const

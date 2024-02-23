@@ -57,8 +57,6 @@ public:
 
   CompiledInstruction compileInstruction(Instruction &ix);
 
-  // TODO: Add serialize
-
   std::optional<PublicKey *> programId(size_t instructionIndex);
 
   std::optional<size_t> programIndex(size_t instruction_index);

@@ -14,6 +14,11 @@
 #include <solana/programs/system_program.h>
 #include <solana/transaction.h>
 
+void separator()
+{
+  Serial.println();
+}
+
 bool transfer()
 {
   const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
@@ -41,9 +46,24 @@ bool transfer()
       // Access parsed data
       const char *blockhash = doc["result"]["value"]["blockhash"];
 
-      Serial.print("blockhash: ");
+      separator();
+      Serial.print("SERIALIZED BLOCKHASH: ");
       Serial.println(String(blockhash));
-      Serial.println("");
+      separator();
+
+      std::vector<uint8_t> recentBlockhash = Base58::trimDecode(blockhash);
+
+      separator();
+      Serial.print("DESERIALIZED BLOCKHASH: ");
+      Base58::printArray(recentBlockhash);
+      separator();
+
+      std::string reSerializeBlockhash = Base58::trimEncode(recentBlockhash);
+
+      separator();
+      Serial.print("RE-SERIALIZED BLOCKHASH: ");
+      Serial.print(reSerializeBlockhash.c_str());
+      separator();
 
       unsigned char config_secret_key[64];
 
@@ -52,19 +72,41 @@ bool transfer()
       Keypair kp = Keypair(config_secret_key);
       Signer signer = Signer(kp);
 
-      Serial.println("");
-      Serial.print("Public Key: ");
-      Serial.println(kp.publicKey.toBase58().c_str());
+      separator();
+      Serial.print("SERIALIZED PUBLIC KEY: ");
+      std::string serializedPublicKey = kp.publicKey.toBase58();
+      Serial.println(serializedPublicKey.c_str());
+      separator();
+
+      separator();
+      Serial.print("DESERIALIZED PUBLIC KEY: ");
+      kp.publicKey.print();
+      separator();
+
+      // TODO: Test this
+      // std::string reSerializePublicKey = Base58::trimEncode(PublicKey::fromString(serializedPublicKey).value().serialize());
+
+      // separator();
+      // Serial.print("RE-SERIALIZED PUBLIC KEY: ");
+      // Serial.print(reSerializePublicKey.c_str());
+      // separator();
 
       String sender = Base58::trimEncode(signer.publicKey().serialize()).c_str();
 
-      String message = "{\"header\":{\"numRequiredSignatures\":1,\"numReadonlySignedAccounts\":0,\"numReadonlyUnsignedAccounts\":1},\"staticAccountKeys\":[\"" + sender + "\",\"11111111111111111111111111111111\"],\"recentBlockhash\":\"" + blockhash + "\",\"compiledInstructions\":[{\"programIdIndex\":1,\"accountKeyIndexes\":[0,0],\"data\":{\"type\":\"Buffer\",\"data\":[2, 0, 0, 0, 128, 240, 250, 2, 0, 0, 0, 0]}}],\"addressTableLookups\":[]}";
+      String message = "{\"header\":{\"numRequiredSignatures\":1,\"numReadonlySignedAccounts\":0,\"numReadonlyUnsignedAccounts\":1},\"staticAccountKeys\":[\"" + sender + "\",\"11111111111111111111111111111111\"],\"recentBlockhash\":\"" + blockhash + "\",\"compiledInstructions\":[{\"programIdIndex\":1,\"accountKeyIndexes\":[0,0],\"data\":{\"type\":\"Buffer\",\"data\":[2,0,0,0,128,240,250,2,0,0,0,0]}}],\"addressTableLookups\":[]}";
+
+      PublicKey recipient = PublicKey(Base58::trimDecode("9qY5qdJ4TNeEcGHTa2FzewjhE9cFj1mAEz9LG9c8sQKy"));
+
+      separator();
+      recipient.print();
+      separator();
 
       AccountMeta *user = AccountMeta::newWritable(signer.publicKey(), true);
+      AccountMeta *receiver = AccountMeta::newWritable(recipient, false);
       std::vector<uint8_t> transferData = {
           0x02, 0x00, 0x00, 0x00, 0x80, 0xf0, 0xfa, 0x02, 0x00, 0x00, 0x00, 0x00};
 
-      std::vector<AccountMeta> accounts = {*user};
+      std::vector<AccountMeta> accounts = {*user, *receiver};
       std::vector<uint8_t> accountBytes;
       for (auto &account : accounts)
       {
@@ -77,12 +119,6 @@ bool transfer()
           accounts);
 
       std::vector<uint8_t> transferIx = ix.serialize();
-      for (auto byte : transferIx)
-      {
-        Serial.print(byte);
-        Serial.print(", ");
-      }
-      Serial.println("");
 
       std::vector<Instruction> ixs;
       ixs.push_back(ix);
@@ -91,11 +127,30 @@ bool transfer()
 
       payer = signer.publicKey();
 
-      std::vector<uint8_t> recentBlockhash = Base58::trimDecode(blockhash);
-
-      Base58::printArray(recentBlockhash);
-
       Message msg = Message::newWithBlockhash(ixs, payer, recentBlockhash);
+
+      separator();
+      Serial.print("SERIALIZED MSG: ");
+      String serializedMsg = Base58::trimEncode(msg.serialize()).c_str();
+      Serial.println(serializedMsg);
+      separator();
+
+      separator();
+      Serial.print("DESERIALIZED MSG: ");
+      std::vector<uint8_t> deserializedMsg = Base58::trimDecode(serializedMsg.c_str());
+      for (auto byte : deserializedMsg)
+      {
+        Serial.print(byte);
+        Serial.print(",");
+      }
+      separator();
+
+      std::string reSerializeMsg = Base58::trimEncode(deserializedMsg);
+
+      separator();
+      Serial.print("RE-SERIALIZED MSG: ");
+      Serial.print(reSerializeMsg.c_str());
+      separator();
 
       Transaction tx = Transaction(msg);
 
@@ -107,74 +162,75 @@ bool transfer()
       tx.sign(signers, Hash(recentBlockhash));
 
       Signature signature = tx.signatures[0];
-      std::vector<uint8_t> signatureBytes = signature.serialize();
+      std::vector<uint8_t> serializedSignature = signature.serialize();
 
-      std::vector<uint8_t> serializedMessage = tx.messageData();
+      separator();
+      Serial.print("SERIALIZED SIGNATURE: ");
+      std::string firstSignature = Base58::trimEncode(serializedSignature);
+      Serial.println(firstSignature.c_str());
+      String stringSignature(firstSignature.c_str());
+      separator();
 
-      std::string bs64Tx(serializedMessage.begin(), serializedMessage.end());
+      separator();
+      Serial.print("DESERIALIZED SIGNATURE: ");
+      for (auto byte : serializedSignature)
+      {
+        Serial.print(byte);
+        Serial.print(",");
+      }
+      separator();
 
-      Serial.print("SERIALIZED MSG: ");
-      String serializedMsg = Base58::trimEncode(msg.serialize()).c_str();
-      Serial.println(serializedMsg);
-      Serial.println();
+      std::string reSerializeSignature = Base58::trimEncode(serializedSignature);
 
+      separator();
+      Serial.print("RE-SERIALIZED SIGNATURE: ");
+      Serial.print(reSerializeSignature.c_str());
+      separator();
+
+      separator();
       Serial.print("SERIALIZED TX: ");
       String serializedTx = Base58::trimEncode(tx.serialize()).c_str();
-      Serial.println(serializedTx);
-      Serial.println();
+      Serial.print(serializedTx);
+      separator();
 
+      separator();
       Serial.print("DESERIALIZED TX: ");
       std::vector<uint8_t> deserializedTx = Base58::trimDecode(serializedTx.c_str());
       for (auto byte : deserializedTx)
       {
         Serial.print(byte);
-        Serial.print(", ");
+        Serial.print(",");
       }
-      Serial.println();
+      separator();
 
-      Serial.print("SIGNATURE: ");
-      for (auto byte : signatureBytes)
-      {
-        Serial.print(byte);
-        Serial.print(", ");
-      }
-      Serial.println();
+      std::string reSerializedTx = Base58::trimEncode(deserializedTx);
 
-      std::string firstSignature = Base58::trimEncode(signatureBytes);
-      Serial.println(firstSignature.c_str());
-      String stringSignature(firstSignature.c_str());
+      separator();
+      Serial.print("RE-SERIALIZED TX: ");
+      Serial.print(reSerializedTx.c_str());
+      separator();
 
-      // Convert signatureBytes to a string of comma-separated bytes
-      std::stringstream sigBytes;
-      sigBytes << '[';
-      for (size_t i = 0; i < signatureBytes.size(); ++i)
-      {
-        sigBytes << static_cast<int>(signatureBytes[i]);
-        if (i != signatureBytes.size() - 1)
-        {
-          sigBytes << ",";
-        }
-      }
-      sigBytes << ']';
+      separator();
+      Serial.print("TX SIZE: ");
+      Serial.print(deserializedTx.size());
+      separator();
 
-      String signatureInBytes = sigBytes.str().c_str();
+      // String reqDataBase64 = base64::encode(serializedTx.c_str());
 
-      String sendTransactionData = "{\"signatures\":" + signatureInBytes + ",\"message\":\"" + message + "\"}";
+      // separator();
+      // Serial.print("Transaction(base64): ");
+      // Serial.println(reqDataBase64);
+      // Serial.println(reqDataBase64.length());
+      // separator();
 
-      Serial.println("\nData: " + sendTransactionData);
+      String configObject = "{\"encoding\":\"base58\", \"skipPreflight\":true, \"preflightCommitment\":\"finalized\", \"maxRetries\":5}";
 
-      std::vector<uint8_t> sendTransactionDataVec(sendTransactionData.begin(), sendTransactionData.end());
-      std::string sendTransactionParam = Base58::trimEncode(sendTransactionDataVec);
+      String reqData = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"sendTransaction\",\"params\":[\"" + String(serializedTx.c_str()) + "\", " + configObject + "]}";
 
-      Serial.println("\nSigned Transaction: " + String(sendTransactionParam.c_str()));
-      std::string ss(sendTransactionParam.begin(), sendTransactionParam.end());
-      String reqDataBase64 = base64::encode(ss.c_str());
-
-      Serial.println("\nTransaction(base64): " + reqDataBase64);
-
-      String reqData = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"sendTransaction\",\"params\":[\"" + String(sendTransactionParam.c_str()) + "\"]}";
-
-      Serial.println("\nSending Transaction: " + reqData);
+      separator();
+      Serial.print("Sending Transaction: ");
+      Serial.println(reqData);
+      separator();
 
       int sendTransactionReq = http.POST(reqData);
 
@@ -189,9 +245,10 @@ bool transfer()
         // Access parsed data
         String signature = sendTransactionDoc["result"];
 
-        Serial.println("");
+        separator();
         Serial.print("Sent Signature: ");
         Serial.println(signature.c_str());
+        separator();
       }
       else
       {

@@ -85,11 +85,23 @@ std::vector<uint8_t> CompiledInstruction::serialize()
     // Serialize programIdIndex
     result.push_back(static_cast<uint8_t>(programIdIndex));
 
+    // Serialize number of accounts
+    uint8_t numAccounts = static_cast<uint8_t>(accounts.size());
+    result.push_back(numAccounts);
+
     // Serialize accounts
     for (const auto &accountIndex : accounts)
     {
         result.push_back(static_cast<uint8_t>(accountIndex));
     }
+
+    // Serialize data size
+    size_t dataSize = data.size();
+    result.push_back(static_cast<uint8_t>(dataSize));
+
+    // TODO: CHECK WHAT TO US LSB/MSB
+    // result.push_back(static_cast<uint8_t>((dataSize >> 0) & 0xFF)); // LSB
+    // result.push_back(static_cast<uint8_t>((dataSize >> 8) & 0xFF)); // MSB
 
     // Serialize data
     result.insert(result.end(), data.begin(), data.end());

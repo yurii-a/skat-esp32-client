@@ -13,7 +13,7 @@ void Base58::printArray(const std::vector<unsigned char> &arr)
     for (const auto &el : arr)
     {
         Serial.print(static_cast<int>(el));
-        Serial.print(" ");
+        Serial.print(",");
     }
     Serial.println();
 }
