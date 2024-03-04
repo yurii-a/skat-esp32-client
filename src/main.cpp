@@ -1,25 +1,22 @@
 #include <Arduino.h>
 #include "config/save_config.h"
 #include "wifi/setup_wifi.h"
-#include "solana/helpers.h"
 #include "client/transfer.h"
-#include "solana/hash.h"
-#include "solana/base58.h"
+#include "client/anchor.h"
+#include "SolanaSDK/keypair.h"
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  // rpc();
+  // saveConfig();
 
-  // save_config();
+  setupWifi();
 
-  setup_wifi();
+  // transfer();
 
-  // test_sign();
-
-  transfer();
+  // anchor();
 }
 
 void loop()

@@ -6,12 +6,14 @@
 #define FILE_MODE_W "w"
 #define FILE_MODE_R "r"
 
-bool get_wifi_config(String* ssid, String* password) {
-  if (!SPIFFS.begin(true)) {
+bool getWifiConfig(String *ssid, String *password)
+{
+  if (!SPIFFS.begin(true))
+  {
     Serial.println("ERROR: Failed to mount file system");
     return false;
   }
-  
+
   // Now open the file for reading.
   File readConfigFile = SPIFFS.open("/config.txt", FILE_MODE_R);
 
@@ -29,8 +31,8 @@ bool get_wifi_config(String* ssid, String* password) {
   // Now deserialize the char array
   deserializeJson(doc, json);
 
-  const char* _ssid = doc["ssid"];
-  const char* _password = doc["password"];
+  const char *_ssid = doc["ssid"];
+  const char *_password = doc["password"];
 
   *ssid = _ssid;
   *password = _password;
@@ -40,12 +42,14 @@ bool get_wifi_config(String* ssid, String* password) {
   return true;
 }
 
-bool get_private_key(unsigned char* pk) {
-  if (!SPIFFS.begin(true)) {
+bool getPrivateKey(unsigned char *pk)
+{
+  if (!SPIFFS.begin(true))
+  {
     Serial.println("ERROR: Failed to mount file system");
     return false;
   }
-  
+
   // Now open the file for reading.
   File readConfigFile = SPIFFS.open("/config.txt", FILE_MODE_R);
 
@@ -65,7 +69,8 @@ bool get_private_key(unsigned char* pk) {
   DeserializationError error = deserializeJson(doc, json);
 
   // Test if parsing succeeds.
-  if (error) {
+  if (error)
+  {
     Serial.print(F("ERROR: "));
     Serial.println(error.f_str());
     return false;
@@ -74,14 +79,16 @@ bool get_private_key(unsigned char* pk) {
   // Get private_key array
   JsonArray private_key = doc["private_key"];
 
-  if (private_key.size() != 64) {
+  if (private_key.size() != 64)
+  {
     Serial.println("ERROR: Invalid private key length, expected 64 bytes");
     return false;
   }
 
   // Convert to unsigned char array
-  for (size_t i = 0; i < private_key.size(); i++) {
-      pk[i] = static_cast<unsigned char>(private_key[i]);
+  for (size_t i = 0; i < private_key.size(); i++)
+  {
+    pk[i] = static_cast<unsigned char>(private_key[i]);
   }
 
   readConfigFile.close();
@@ -89,18 +96,21 @@ bool get_private_key(unsigned char* pk) {
   return true;
 }
 
-bool save_config() {
-  if (!SPIFFS.begin(true)) {
+bool saveConfig()
+{
+  if (!SPIFFS.begin(true))
+  {
     Serial.println("ERROR: Failed to mount file system");
     return false;
   }
 
   File configFile = SPIFFS.open("/config.txt", FILE_MODE_W);
-  if (!configFile) {
+  if (!configFile)
+  {
     Serial.println("Failed to open config.txt for writing");
     return false;
   }
-  
+
   configFile.println("{ \"ssid\": \"<SSID>\", \"password\": \"<PASSWORD>\", \"private_key\": <PRIVATE_KEY> }");
   configFile.close();
 
@@ -111,7 +121,7 @@ bool save_config() {
   String ssid;
   String password;
 
-  get_wifi_config(&ssid, &password);
+  getWifiConfig(&ssid, &password);
 
   Serial.println("ssid: " + ssid);
 

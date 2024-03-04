@@ -15,12 +15,7 @@
 #include <SolanaSDK/transaction.h>
 #include <SolanaSDK/connection.h>
 
-void separator()
-{
-  Serial.println();
-}
-
-bool transfer()
+bool anchor()
 {
   const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
   const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
@@ -30,9 +25,6 @@ bool transfer()
   // Make the REST API call
   if (WiFi.status() == WL_CONNECTED)
   {
-    HTTPClient http;
-    // http.begin(mainnetRPC);
-    http.begin(devnetRPC);
 
     Connection connection = Connection(devnetRPC, Commitment::confirmed);
 
@@ -46,20 +38,25 @@ bool transfer()
     Keypair kp = Keypair(configSecretKey);
     Signer signer = Signer(kp);
 
-    String sender = Base58::trimEncode(signer.publicKey().serialize()).c_str();
-    Serial.print("SENDER: ");
-    Serial.println(sender);
+    String payer = Base58::trimEncode(signer.publicKey().serialize()).c_str();
+    Serial.print("PAYER: ");
+    Serial.println(payer);
 
-    PublicKey recipient = PublicKey(Base58::trimDecode("9qY5qdJ4TNeEcGHTa2FzewjhE9cFj1mAEz9LG9c8sQKy"));
-    Serial.print("RECIPIENT: ");
-    Serial.println(recipient.toBase58().c_str());
+    Keypair data = Keypair::generate();
+    Serial.print("DATA: ");
+    Serial.println(data.publicKey.toBase58().c_str());
 
-    AccountMeta *user = AccountMeta::newWritable(signer.publicKey(), true);
-    AccountMeta *receiver = AccountMeta::newWritable(recipient, false);
-    std::vector<uint8_t> transferData = {
-        0x02, 0x00, 0x00, 0x00, 0x80, 0xf0, 0xfa, 0x02, 0x00, 0x00, 0x00, 0x00};
+    AccountMeta *payerAccountMeta = AccountMeta::newWritable(signer.publicKey(), true);
+    AccountMeta *dataAccountMeta = AccountMeta::newWritable(data.publicKey, true);
+    PublicKey systemProgramId = SystemProgram::id();
+    AccountMeta *systemProgramAccountMeta = AccountMeta::newReadonly(systemProgramId, false);
 
-    std::vector<AccountMeta> accounts = {*user, *receiver};
+    std::vector<uint8_t> transferData = {0xaf, 0xaf, 0x6d, 0x1f, 0x0d, 0x98, 0x9b, 0xed, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    std::vector<AccountMeta> accounts = {*dataAccountMeta, *payerAccountMeta, *systemProgramAccountMeta};
+
+    PublicKey axsProgramId = PublicKey(Base58::trimDecode("38m8XgmGy4p1nstZsr82b1U4qvaRbSEjaeLHy8c4brDP"));
+
     std::vector<uint8_t> accountBytes;
     for (auto &account : accounts)
     {
@@ -68,7 +65,7 @@ bool transfer()
     }
 
     Instruction ix = Instruction::newWithBytes(
-        SystemProgram::id(), transferData,
+        axsProgramId, transferData,
         accounts);
 
     std::vector<uint8_t> transferIx = ix.serialize();
@@ -76,28 +73,30 @@ bool transfer()
     std::vector<Instruction> ixs;
     ixs.push_back(ix);
 
-    std::optional<PublicKey> payer;
+    std::optional<PublicKey> feePayer;
 
-    payer = signer.publicKey();
+    feePayer = signer.publicKey();
 
-    Message msg = Message::newWithBlockhash(ixs, payer, recentBlockhash.blockhash);
+    Message msg = Message::newWithBlockhash(ixs, feePayer, recentBlockhash.blockhash);
+
+    std::vector<uint8_t> serializedMsg = msg.serialize();
 
     Transaction tx = Transaction(msg);
 
     std::vector<Signer> signerVector;
     signerVector.push_back(signer);
+    signerVector.push_back(data);
 
     Signers signers(signerVector);
 
     tx.sign(signers, recentBlockhash.blockhash);
 
+    std::vector<uint8_t> serializedTx = tx.serialize();
+
     Signature returnedSignature = connection.sendTransaction(tx);
 
     Serial.print("SIGNATURE: ");
     Serial.println(returnedSignature.toString().c_str());
-    separator();
-
-    http.end();
   }
 
   return true;

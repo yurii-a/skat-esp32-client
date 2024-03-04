@@ -1,1 +1,1 @@
-bool setup_wifi();
+bool setupWifi();
