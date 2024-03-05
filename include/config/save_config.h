@@ -8,4 +8,4 @@ bool getWifiConfig(String *ssid, String *password);
 
 bool getPrivateKey(unsigned char *private_key);
 
-bool saveConfig();
+bool saveConfig(String ssid, String password, String privateKey);

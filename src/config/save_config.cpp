@@ -96,7 +96,7 @@ bool getPrivateKey(unsigned char *pk)
   return true;
 }
 
-bool saveConfig()
+bool saveConfig(String ssid, String password, String privateKey)
 {
   if (!SPIFFS.begin(true))
   {
@@ -111,15 +111,12 @@ bool saveConfig()
     return false;
   }
 
-  configFile.println("{ \"ssid\": \"<SSID>\", \"password\": \"<PASSWORD>\", \"private_key\": <PRIVATE_KEY> }");
+  configFile.println("{ \"ssid\": \"" + ssid + "\", \"password\": \"" + password + "\", \"private_key\": " + privateKey + " }");
   configFile.close();
 
   SPIFFS.end();
 
   Serial.println("Config saved!");
-
-  String ssid;
-  String password;
 
   getWifiConfig(&ssid, &password);
 

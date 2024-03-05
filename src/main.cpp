@@ -4,22 +4,16 @@
 #include "client/transfer.h"
 #include "client/anchor.h"
 #include "SolanaSDK/keypair.h"
+#include "server/web_server.h"
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  // saveConfig();
-
   setupWifi();
 
   // transfer();
 
   // anchor();
-}
-
-void loop()
-{
-  // put your main code here, to run repeatedly:
 }

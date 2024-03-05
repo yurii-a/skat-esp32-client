@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include "config/save_config.h"
+#include "server/web_server.h"
 
 #define FILE_MODE_R "r"
 
@@ -42,10 +43,12 @@ bool setupWifi()
   }
   else
   {
+    WiFi.disconnect();
     Serial.println("\nWiFi connection failed!");
     // Handle connection failure, e.g., try again or report error
-    return false;
+    // return false;
   }
+  setupWebServer();
 
   return true;
 }
