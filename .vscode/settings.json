@@ -72,5 +72,6 @@
     "thread": "cpp",
     "list": "cpp",
     "regex": "cpp"
-  }
+  },
+  "C_Cpp.errorSquiggles": "enabled"
 }

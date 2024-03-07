@@ -6,14 +6,19 @@
 #include "SolanaSDK/keypair.h"
 #include "server/web_server.h"
 
-void setup()
-{
+void setup(){
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  setupWifi();
+  // // saveConfig();
 
-  // transfer();
+  // setupWifi();
+
+  // // rpc();
+
+  // transfer(0.03);
 
   // anchor();
+
+  
 }

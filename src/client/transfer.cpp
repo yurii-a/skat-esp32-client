@@ -20,7 +20,29 @@ void separator()
   Serial.println();
 }
 
-bool transfer()
+const uint64_t LAMPORTS_PER_SOL = 1000000000;
+
+std::vector<uint8_t> get_transfer_data(uint64_t number) {
+    std::vector<uint8_t> amount_hex;
+    std::vector<uint8_t> transferData = {
+        0x02, 0x00, 0x00, 0x00};
+    
+    // Extract individual bytes
+    amount_hex.push_back((number >> 56) & 0xFF);
+    amount_hex.push_back((number >> 48) & 0xFF);
+    amount_hex.push_back((number >> 40) & 0xFF);
+    amount_hex.push_back((number >> 32) & 0xFF);
+    amount_hex.push_back((number >> 24) & 0xFF);
+    amount_hex.push_back((number >> 16) & 0xFF);
+    amount_hex.push_back((number >> 8) & 0xFF);
+    amount_hex.push_back(number & 0xFF);
+    std::reverse(amount_hex.begin(), amount_hex.end());
+    transferData.insert(transferData.end(), amount_hex.begin(), amount_hex.end());
+
+    return transferData;
+}
+
+bool transfer(float amount)
 {
   const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
   const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
@@ -50,14 +72,13 @@ bool transfer()
     Serial.print("SENDER: ");
     Serial.println(sender);
 
-    PublicKey recipient = PublicKey(Base58::trimDecode("9qY5qdJ4TNeEcGHTa2FzewjhE9cFj1mAEz9LG9c8sQKy"));
+    PublicKey recipient = PublicKey(Base58::trimDecode("BDEECMrE5dv4cc5na6Fi8sNkfzYxckd6ZjsuEzp7hXnJ"));
     Serial.print("RECIPIENT: ");
     Serial.println(recipient.toBase58().c_str());
 
     AccountMeta *user = AccountMeta::newWritable(signer.publicKey(), true);
     AccountMeta *receiver = AccountMeta::newWritable(recipient, false);
-    std::vector<uint8_t> transferData = {
-        0x02, 0x00, 0x00, 0x00, 0x80, 0xf0, 0xfa, 0x02, 0x00, 0x00, 0x00, 0x00};
+    std::vector<uint8_t> transferData = get_transfer_data(amount*LAMPORTS_PER_SOL);
 
     std::vector<AccountMeta> accounts = {*user, *receiver};
     std::vector<uint8_t> accountBytes;
