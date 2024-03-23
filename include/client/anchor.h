@@ -1,1 +1,1 @@
-bool anchor();
+String anchor();

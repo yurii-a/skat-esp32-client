@@ -15,17 +15,13 @@
 #include <SolanaSDK/transaction.h>
 #include <SolanaSDK/connection.h>
 
-bool anchor()
+String anchor()
 {
-  const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
+  const char *devnetRPC = "https://parental-ardenia-fast-devnet.helius-rpc.com/";
   const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
 
-  // Establish WiFi connection (code from previous snippet)
-
-  // Make the REST API call
   if (WiFi.status() == WL_CONNECTED)
   {
-
     Connection connection = Connection(devnetRPC, Commitment::confirmed);
 
     BlockhashWithExpiryBlockHeight recentBlockhash = connection.getLatestBlockhash();
@@ -97,7 +93,6 @@ bool anchor()
 
     Serial.print("SIGNATURE: ");
     Serial.println(returnedSignature.toString().c_str());
+    return returnedSignature.toString().c_str();
   }
-
-  return true;
 }

@@ -5,6 +5,8 @@
 #include <WiFi.h>
 #include "config/save_config.h"
 #include "server/web_server.h"
+#include "SolanaSDK/keypair.h"
+#include "SolanaSDK/signer.h"
 
 #define FILE_MODE_R "r"
 
@@ -16,6 +18,18 @@ bool setupWifi()
   String password;
 
   getWifiConfig(&ssid, &password);
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
+  Serial.println("\n");
 
   Serial.println("\n\n----- WiFi Setup -----");
   WiFi.begin(ssid, password);
@@ -40,6 +54,16 @@ bool setupWifi()
     Serial.println("\nWiFi connected: " + ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+
+    unsigned char configSecretKey[64];
+
+    getPrivateKey(configSecretKey);
+
+    Keypair kp = Keypair(configSecretKey);
+    Signer signer = Signer(kp);
+    String payer = Base58::trimEncode(signer.publicKey().serialize()).c_str();
+    Serial.print("PAYER: ");
+    Serial.println(payer);
   }
   else
   {
