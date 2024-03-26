@@ -1,62 +1,64 @@
-#include <Arduino.h>
-#include "config/save_config.h"
-#include "wifi/setup_wifi.h"
-#include "client/transfer.h"
-#include "client/anchor.h"
-#include "client/bonk.h"
-#include "SolanaSDK/keypair.h"
-#include "server/web_server.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <Wire.h>
 
-#define LED_PIN 15
-#define BUTTON_PIN 2
-#define CHECK_INTERVAL 1000 // Interval for checking button state (milliseconds)
-#define COUNT_THRESHOLD 3   // Number of times button pin needs to be high
-#define GRACE_TIME 15000
-#define RESET_TIME 3500 // Time in milliseconds to reset the counter
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
-unsigned long lastCheckTime = 0;
-unsigned int buttonHighCount = 0;
+#define OLED_RESET -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 
-void setup()
-{
-  // put your setup code here, to run once:
+#define BUTTON_PIN 2 // Define your button pin
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void setup() {
   Serial.begin(115200);
 
-  setupWifi();
+  // Initialize display
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;)
+      ;
+  }
 
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT);
+  // Clear the buffer
+  display.clearDisplay();
 }
 
-void loop()
-{
-  axsServer.handleClient();
-  unsigned long currentTime = millis();
+void loop() {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor((SCREEN_WIDTH - (strlen("Project AXS") * 6)) / 2, SCREEN_HEIGHT / 2 - 8); // Center horizontally, slightly above center vertically
+    display.println(F("Project AXS"));
+    display.display();
 
-  if (currentTime - lastCheckTime >= CHECK_INTERVAL)
-  {
-    if (digitalRead(BUTTON_PIN) == HIGH)
-    {
-      lastCheckTime = currentTime;
-      buttonHighCount++;
-      Serial.println("HONK");
-    }
-    else
-    {
-      digitalWrite(LED_PIN, LOW);
-    }
-  }
+  if (digitalRead(BUTTON_PIN) == HIGH) { // Check if button is pressed
+    // First display
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor((SCREEN_WIDTH - (strlen("Sending transaction!") * 6)) / 2, SCREEN_HEIGHT / 2 - 8); // Center horizontally, slightly above center vertically
+    display.println(F("Sending transaction!"));
+    display.display();
+    delay(2000);
 
-  if (buttonHighCount >= COUNT_THRESHOLD && currentTime - lastCheckTime < GRACE_TIME)
-  {
-    buttonHighCount = 0;
-    lastCheckTime = currentTime;
-    digitalWrite(LED_PIN, HIGH);
-    transferBonk();
-  }
+    // Second display
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor((SCREEN_WIDTH - (strlen("Transaction Sent!") * 6)) / 2, SCREEN_HEIGHT / 2 - 8); // Center horizontally, slightly above center vertically
+    display.println(F("Transaction Sent!"));
+    display.display();
+    delay(2000);
 
-  if (currentTime - lastCheckTime >= RESET_TIME)
-  {
-    buttonHighCount = 0;
+    // Third display
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor((SCREEN_WIDTH - (strlen("Guess what MERT said?") * 6)) / 2, SCREEN_HEIGHT / 2 - 8); // Center horizontally, slightly above center vertically
+    display.println(F("Guess what MERT said?"));
+    display.display();
+    delay(2000);
   }
 }

@@ -72,5 +72,6 @@
     "thread": "cpp",
     "list": "cpp",
     "regex": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "/Users/saicharan/Documents/My/contributions/ArduinoSDK/.pio/libdeps/nodemcu-32s/ArduinoJson/src"
 }
