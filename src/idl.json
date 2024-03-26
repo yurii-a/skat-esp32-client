@@ -1,0 +1,539 @@
+{
+    "version": "0.1.0",
+    "name": "amm",
+    "instructions": [
+      {
+        "name": "initialize",
+        "accounts": [
+          {
+            "name": "initializer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintX",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintY",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintLp",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "auth",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "config",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "seed",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u16"
+          },
+          {
+            "name": "authority",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      },
+      {
+        "name": "deposit",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintX",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintY",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintLp",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userLp",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "auth",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "config",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "maxX",
+            "type": "u64"
+          },
+          {
+            "name": "maxY",
+            "type": "u64"
+          },
+          {
+            "name": "expiration",
+            "type": "i64"
+          }
+        ]
+      },
+      {
+        "name": "withdraw",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintX",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintY",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintLp",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userLp",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "auth",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "config",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "minX",
+            "type": "u64"
+          },
+          {
+            "name": "minY",
+            "type": "u64"
+          },
+          {
+            "name": "expiration",
+            "type": "i64"
+          }
+        ]
+      },
+      {
+        "name": "swap",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mintX",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "mintY",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "userX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "userY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultX",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "vaultY",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "auth",
+            "isMut": false,
+            "isSigner": false,
+            "docs": [
+              "CHECKED: This is not dangerous. It's just used for signing."
+            ]
+          },
+          {
+            "name": "config",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "isX",
+            "type": "bool"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "min",
+            "type": "u64"
+          },
+          {
+            "name": "expiration",
+            "type": "i64"
+          }
+        ]
+      },
+      {
+        "name": "lock",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "config",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "unlock",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "config",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Config",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "seed",
+              "type": "u64"
+            },
+            {
+              "name": "authority",
+              "type": {
+                "option": "publicKey"
+              }
+            },
+            {
+              "name": "mintX",
+              "type": "publicKey"
+            },
+            {
+              "name": "mintY",
+              "type": "publicKey"
+            },
+            {
+              "name": "fee",
+              "type": "u16"
+            },
+            {
+              "name": "locked",
+              "type": "bool"
+            },
+            {
+              "name": "authBump",
+              "type": "u8"
+            },
+            {
+              "name": "configBump",
+              "type": "u8"
+            },
+            {
+              "name": "lpBump",
+              "type": "u8"
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "DefaultError",
+        "msg": "DefaultError"
+      },
+      {
+        "code": 6001,
+        "name": "OfferExpired",
+        "msg": "Offer expired."
+      },
+      {
+        "code": 6002,
+        "name": "PoolLocked",
+        "msg": "This pool is locked."
+      },
+      {
+        "code": 6003,
+        "name": "SlippageExceeded",
+        "msg": "Slippage exceeded."
+      },
+      {
+        "code": 6004,
+        "name": "Overflow",
+        "msg": "Overflow detected."
+      },
+      {
+        "code": 6005,
+        "name": "Underflow",
+        "msg": "Underflow detected."
+      },
+      {
+        "code": 6006,
+        "name": "InvalidToken",
+        "msg": "Invalid token."
+      },
+      {
+        "code": 6007,
+        "name": "LiquidityLessThanMinimum",
+        "msg": "Actual liquidity is less than minimum."
+      },
+      {
+        "code": 6008,
+        "name": "NoLiquidityInPool",
+        "msg": "No liquidity in pool."
+      },
+      {
+        "code": 6009,
+        "name": "BumpError",
+        "msg": "Bump error."
+      },
+      {
+        "code": 6010,
+        "name": "CurveError",
+        "msg": "Curve error."
+      },
+      {
+        "code": 6011,
+        "name": "InvalidFee",
+        "msg": "Fee is greater than 100%. This is not a very good deal."
+      },
+      {
+        "code": 6012,
+        "name": "InvalidAuthority",
+        "msg": "Invalid update authority."
+      },
+      {
+        "code": 6013,
+        "name": "NoAuthoritySet",
+        "msg": "No update authority set."
+      },
+      {
+        "code": 6014,
+        "name": "InvalidAmount",
+        "msg": "Invalid amount."
+      },
+      {
+        "code": 6015,
+        "name": "InvalidPrecision",
+        "msg": "Invalid precision."
+      },
+      {
+        "code": 6016,
+        "name": "InsufficientBalance",
+        "msg": "Insufficient balance."
+      },
+      {
+        "code": 6017,
+        "name": "ZeroBalance",
+        "msg": "Zero balance."
+      }
+    ],
+    "metadata": {
+      "address": "4HEZbJw1upvMYwoin8P3LFSWZyzKw1PvnAN21mWzw1cZ"
+    }
+  }

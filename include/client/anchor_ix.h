@@ -1,0 +1,1 @@
+bool anchor_ix();

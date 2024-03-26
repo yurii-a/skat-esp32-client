@@ -71,7 +71,11 @@
     "condition_variable": "cpp",
     "thread": "cpp",
     "list": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "any": "cpp",
+    "codecvt": "cpp",
+    "forward_list": "cpp",
+    "valarray": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
