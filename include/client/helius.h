@@ -1,1 +1,3 @@
-bool rpc();
+#include <string>
+
+String rpc();
