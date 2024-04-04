@@ -1,1 +1,1 @@
-String anchor();
+String anchor(String data, int dataHexSize);

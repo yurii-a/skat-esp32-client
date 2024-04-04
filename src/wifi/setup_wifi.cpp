@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include "config/save_config.h"
+#include "config/utils.h"
 #include "server/web_server.h"
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/signer.h"
@@ -17,7 +18,7 @@ bool setupWifi()
   String ssid;
   String password;
 
-  getWifiConfig(&ssid, &password);
+  getWifiConfig(ssid, password);
   Serial.println("\n");
   Serial.println("\n");
   Serial.println("\n");
@@ -54,16 +55,6 @@ bool setupWifi()
     Serial.println("\nWiFi connected: " + ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-
-    unsigned char configSecretKey[64];
-
-    getPrivateKey(configSecretKey);
-
-    Keypair kp = Keypair(configSecretKey);
-    Signer signer = Signer(kp);
-    String payer = Base58::trimEncode(signer.publicKey().serialize()).c_str();
-    Serial.print("PAYER: ");
-    Serial.println(payer);
   }
   else
   {

@@ -6,121 +6,101 @@
 #define FILE_MODE_W "w"
 #define FILE_MODE_R "r"
 
-bool getWifiConfig(String *ssid, String *password)
-{
-  if (!SPIFFS.begin(true))
-  {
+const char* WIFI_CONFIG_FILE_PATH = "/wifi_config.txt";
+const char* PRIVATE_KEY_FILE_PATH = "/private_key.txt";
+
+bool mountFileSystem() {
+  if (!SPIFFS.begin(true)) {
     Serial.println("ERROR: Failed to mount file system");
     return false;
   }
-
-  // Now open the file for reading.
-  File readConfigFile = SPIFFS.open("/config.txt", FILE_MODE_R);
-
-  // Serial.println("READ:" + readConfigFile.readString());
-
-  DynamicJsonDocument doc(2048);
-  String readConfigString = readConfigFile.readString();
-
-  // Create a permanent char array
-  char json[readConfigString.length() + 1];
-
-  // Copy the contents of the String to the char array
-  readConfigString.toCharArray(json, sizeof(json));
-
-  // Now deserialize the char array
-  deserializeJson(doc, json);
-
-  const char *_ssid = doc["ssid"];
-  const char *_password = doc["password"];
-
-  *ssid = _ssid;
-  *password = _password;
-
-  readConfigFile.close();
-
   return true;
 }
 
-bool getPrivateKey(unsigned char *pk)
-{
-  if (!SPIFFS.begin(true))
-  {
-    Serial.println("ERROR: Failed to mount file system");
-    return false;
-  }
-
-  // Now open the file for reading.
-  File readConfigFile = SPIFFS.open("/config.txt", FILE_MODE_R);
-
-  // Serial.println("READ:" + readConfigFile.readString());
-
-  DynamicJsonDocument doc(2048);
-  String readConfigString = readConfigFile.readString();
-
-  // Create a permanent char array
-  char json[readConfigString.length() + 1];
-
-  // Copy the contents of the String to the char array
-  readConfigString.toCharArray(json, sizeof(json));
-
-  // Now deserialize the char array
-  // Parse the JSON string
-  DeserializationError error = deserializeJson(doc, json);
-
-  // Test if parsing succeeds.
-  if (error)
-  {
-    Serial.print(F("ERROR: "));
-    Serial.println(error.f_str());
-    return false;
-  }
-
-  // Get private_key array
-  JsonArray private_key = doc["private_key"];
-
-  if (private_key.size() != 64)
-  {
-    Serial.println("ERROR: Invalid private key length, expected 64 bytes");
-    return false;
-  }
-
-  // Convert to unsigned char array
-  for (size_t i = 0; i < private_key.size(); i++)
-  {
-    pk[i] = static_cast<unsigned char>(private_key[i]);
-  }
-
-  readConfigFile.close();
-
-  return true;
-}
-
-bool saveConfig(String ssid, String password, String privateKey)
-{
-  if (!SPIFFS.begin(true))
-  {
-    Serial.println("ERROR: Failed to mount file system");
-    return false;
-  }
-
-  File configFile = SPIFFS.open("/config.txt", FILE_MODE_W);
-  if (!configFile)
-  {
-    Serial.println("Failed to open config.txt for writing");
-    return false;
-  }
-
-  configFile.println("{ \"ssid\": \"" + ssid + "\", \"password\": \"" + password + "\", \"private_key\": " + privateKey + " }");
-  configFile.close();
-
+bool unmountFileSystem() {
   SPIFFS.end();
+  return true;
+}
 
-  Serial.println("Config saved!");
+bool readFile(const char* filePath, String& content) {
+  if (!mountFileSystem()) {
+    return false;
+  }
 
-  getWifiConfig(&ssid, &password);
+  File file = SPIFFS.open(filePath, FILE_MODE_R);
+  if (!file) {
+    Serial.println("ERROR: Failed to open file for reading");
+    unmountFileSystem();
+    return false;
+  }
 
-  Serial.println("ssid: " + ssid);
+  content = file.readString();
+  content.trim();
+  file.close();
+  unmountFileSystem();
+  return true;
+}
+
+bool writeFile(const char* filePath, const String& content) {
+  if (!mountFileSystem()) {
+    return false;
+  }
+
+  File file = SPIFFS.open(filePath, FILE_MODE_W);
+  if (!file) {
+    Serial.println("ERROR: Failed to open file for writing");
+    unmountFileSystem();
+    return false;
+  }
+  
+  file.println(content);
+  file.close();
+  unmountFileSystem();
+  return true;
+}
+
+bool getWifiConfig(String& ssid, String& password) {
+  String content;
+  if (!readFile(WIFI_CONFIG_FILE_PATH, content)) {
+    return false;
+  }
+
+  DynamicJsonDocument doc(1024);
+  DeserializationError error = deserializeJson(doc, content);
+
+  if (error) {
+    Serial.println("ERROR: Failed to parse JSON");
+    return false;
+  }
+
+  ssid = doc["ssid"].as<String>();
+  password = doc["password"].as<String>();
 
   return true;
+}
+
+bool saveWifiConfig(const String& ssid, const String& password) {
+  DynamicJsonDocument doc(1024);
+  doc["ssid"] = ssid;
+  doc["password"] = password;
+
+  String content;
+  serializeJson(doc, content);
+
+  return writeFile(WIFI_CONFIG_FILE_PATH, content);
+}
+
+bool getPrivateKey(String& privateKey) {
+  return readFile(PRIVATE_KEY_FILE_PATH, privateKey);
+}
+
+bool savePrivateKey(const String& privateKey) {
+  return writeFile(PRIVATE_KEY_FILE_PATH, privateKey);
+}
+
+bool saveConfig(const String& ssid, const String& password, const String& privateKey) {
+  if (!saveWifiConfig(ssid, password)) {
+    return false;
+  }
+  return savePrivateKey(privateKey);
 }

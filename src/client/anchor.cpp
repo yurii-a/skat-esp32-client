@@ -5,6 +5,7 @@
 #include <vector>
 #include <base64.h>
 #include "config/save_config.h"
+#include "config/utils.h"
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/signer.h"
 #include <SolanaSDK/base58.h>
@@ -15,7 +16,7 @@
 #include <SolanaSDK/transaction.h>
 #include <SolanaSDK/connection.h>
 
-String anchor()
+String anchor(String data, int dataHexSize)
 {
   const char *devnetRPC = "https://parental-ardenia-fast-devnet.helius-rpc.com/";
   const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
@@ -27,31 +28,54 @@ String anchor()
     BlockhashWithExpiryBlockHeight recentBlockhash = connection.getLatestBlockhash();
 
     // Get secret key from saved config
-    unsigned char configSecretKey[64];
+    String configSecretKey;
 
     getPrivateKey(configSecretKey);
 
-    Keypair kp = Keypair(configSecretKey);
+    Keypair kp = Keypair(stringToKeypair(configSecretKey.c_str()));
     Signer signer = Signer(kp);
 
     String payer = Base58::trimEncode(signer.publicKey().serialize()).c_str();
     Serial.print("PAYER: ");
     Serial.println(payer);
 
-    Keypair data = Keypair::generate();
+    Keypair dataPda = Keypair::generate();
     Serial.print("DATA: ");
-    Serial.println(data.publicKey.toBase58().c_str());
+    Serial.println(dataPda.publicKey.toBase58().c_str());
 
     AccountMeta *payerAccountMeta = AccountMeta::newWritable(signer.publicKey(), true);
-    AccountMeta *dataAccountMeta = AccountMeta::newWritable(data.publicKey, true);
+    AccountMeta *dataAccountMeta = AccountMeta::newWritable(dataPda.publicKey, true);
     PublicKey systemProgramId = SystemProgram::id();
     AccountMeta *systemProgramAccountMeta = AccountMeta::newReadonly(systemProgramId, false);
 
-    std::vector<uint8_t> transferData = {0xaf, 0xaf, 0x6d, 0x1f, 0x0d, 0x98, 0x9b, 0xed, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    std::vector<uint8_t> transferData = {0xaf, 0xaf, 0x6d, 0x1f, 0x0d, 0x98, 0x9b, 0xed};
+
+    std::vector<uint8_t> tempData;
+
+    for (int i = 3; i >= 0; i--) {
+      tempData.push_back((dataHexSize >> (8 * i)) & 0xFF);
+    }
+    
+    reverseVector(tempData);
+
+    transferData.insert(transferData.end(), tempData.begin(), tempData.end());
+
+    for (int i = 0; data[i] != '\0'; i++) {
+      transferData.push_back(static_cast<uint8_t>(data[i]));
+    }
+
+    transferData.push_back(0x00);
+
+    Serial.print("DATA: ");
+    for (auto byte : transferData) {
+        Serial.print(byte, HEX);
+        Serial.print(" ");
+    }
+    Serial.println();
 
     std::vector<AccountMeta> accounts = {*dataAccountMeta, *payerAccountMeta, *systemProgramAccountMeta};
 
-    PublicKey axsProgramId = PublicKey(Base58::trimDecode("38m8XgmGy4p1nstZsr82b1U4qvaRbSEjaeLHy8c4brDP"));
+    PublicKey axsProgramId = PublicKey(Base58::trimDecode("UvYJbGcunVqiZT6v4pZXXd6CRSa4XnhsNPGUcyVYW1V"));
 
     std::vector<uint8_t> accountBytes;
     for (auto &account : accounts)
@@ -81,7 +105,7 @@ String anchor()
 
     std::vector<Signer> signerVector;
     signerVector.push_back(signer);
-    signerVector.push_back(data);
+    signerVector.push_back(dataPda);
 
     Signers signers(signerVector);
 

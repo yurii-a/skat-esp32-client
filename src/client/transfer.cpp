@@ -5,6 +5,7 @@
 #include <vector>
 #include <base64.h>
 #include "config/save_config.h"
+#include "config/utils.h"
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/signer.h"
 #include <SolanaSDK/base58.h>
@@ -39,11 +40,11 @@ bool transfer()
     BlockhashWithExpiryBlockHeight recentBlockhash = connection.getLatestBlockhash();
 
     // Get secret key from saved config
-    unsigned char configSecretKey[64];
+    String configSecretKey;
 
     getPrivateKey(configSecretKey);
 
-    Keypair kp = Keypair(configSecretKey);
+    Keypair kp = Keypair(stringToKeypair(configSecretKey.c_str()));
     Signer signer = Signer(kp);
 
     String sender = Base58::trimEncode(signer.publicKey().serialize()).c_str();

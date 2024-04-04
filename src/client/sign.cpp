@@ -1,15 +1,16 @@
 #include <string>
 #include "config/save_config.h"
+#include "config/utils.h"
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/signer.h"
 
 void test_sign()
 {
-  unsigned char config_secret_key[64];
+    String configSecretKey;
 
-  getPrivateKey(config_secret_key);
+    getPrivateKey(configSecretKey);
 
-  Keypair kp = Keypair(config_secret_key);
+    Keypair kp = Keypair(stringToKeypair(configSecretKey.c_str()));
   Signer signer = Signer(kp);
 
   Serial.print("Public Key: ");
