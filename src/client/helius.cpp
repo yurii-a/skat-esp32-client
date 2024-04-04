@@ -93,6 +93,8 @@ String rpc()
 
     Serial.print("SIGNATURE: ");
     Serial.println(returnedSignature.toString().c_str());
-  } 
+
+    return returnedSignature.toString().c_str();
+  }
   return "";
 }
