@@ -3,6 +3,7 @@
 #include "wifi/setup_wifi.h"
 #include "client/transfer.h"
 #include "client/anchor_ix.h"
+#include "client/vote_ix.h"
 #include "SolanaSDK/keypair.h"
 #include "server/web_server.h"
 #include<string.h>
@@ -21,11 +22,12 @@ void setup(){
 
   setupWifi();
 
+  vote_ix(1);
   // // rpc();
 
   // transfer(0.03);
 
-  anchor_ix();
+  // anchor_ix();
 
 
   // std::ifstream f("idl.json");

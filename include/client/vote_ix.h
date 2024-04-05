@@ -1,0 +1,1 @@
+bool vote_ix(int x);
