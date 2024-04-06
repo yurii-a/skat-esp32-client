@@ -1,0 +1,1 @@
+bool stake(int x);

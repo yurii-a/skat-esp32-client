@@ -4,6 +4,7 @@
 #include "client/transfer.h"
 #include "client/anchor_ix.h"
 #include "client/vote_ix.h"
+#include "client/stake.h"
 #include "SolanaSDK/keypair.h"
 #include "server/web_server.h"
 #include<string.h>
@@ -23,6 +24,8 @@ void setup(){
   setupWifi();
 
   vote_ix(1);
+
+  // stake(1); // deposit
   // // rpc();
 
   // transfer(0.03);
