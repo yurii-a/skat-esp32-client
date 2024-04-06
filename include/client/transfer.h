@@ -1,1 +1,1 @@
-bool transfer();
+bool transfer(float amount);

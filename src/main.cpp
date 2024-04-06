@@ -20,7 +20,8 @@
 
 Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT, &Wire, -1, 8000000);
 
-void displayQRCode(const char* text) {
+void displayQRCode(const char *text)
+{
   QRCode qrcode;
 
   uint8_t qrcodeData[qrcode_getBufferSize(3)];
@@ -34,18 +35,22 @@ void displayQRCode(const char* text) {
   uint16_t fillColor = WHITE;
   uint16_t clearColor = BLACK;
 
-  for (uint8_t y = 0; y < qrcode.size; y++) {
-    for (uint8_t x = 0; x < qrcode.size; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
+  for (uint8_t y = 0; y < qrcode.size; y++)
+  {
+    for (uint8_t x = 0; x < qrcode.size; x++)
+    {
+      if (qrcode_getModule(&qrcode, x, y))
+      {
         display.fillRect(shiftX + x * scale, shiftY + y * scale, scale, scale, fillColor);
-      } else {
+      }
+      else
+      {
         display.fillRect(shiftX + x * scale, shiftY + y * scale, scale, scale, clearColor);
       }
     }
   }
   display.display();
 }
-
 
 void setup()
 {
@@ -61,9 +66,9 @@ void setup()
 void loop()
 {
   axsServer.handleClient();
-    display.clearDisplay();
+  display.clearDisplay();
 
-    String checkin = "https://tiplink.io/m/focdQjLAlj";
+  String checkin = "https://tiplink.io/m/focdQjLAlj";
 
-    displayQRCode(checkin.c_str());
+  displayQRCode(checkin.c_str());
 }
