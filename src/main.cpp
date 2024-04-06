@@ -23,9 +23,9 @@ void setup(){
 
   setupWifi();
 
-  vote_ix(1);
+  // vote_ix(1);
 
-  // stake(1); // deposit
+  stake(1); // deposit
   // // rpc();
 
   // transfer(0.03);

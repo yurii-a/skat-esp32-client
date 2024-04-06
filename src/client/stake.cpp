@@ -18,7 +18,7 @@
 // using json = nlohmann::json;
 
 
-std::vector<uint8_t> bufferToHexUint8Vector_vote(std::vector<uint8_t> buffer) {
+std::vector<uint8_t> bufferToHexUint8Vector_stake(std::vector<uint8_t> buffer) {
     std::vector<uint8_t> result;
     for (size_t i = 0; i < buffer.size(); ++i) {
         result.push_back(static_cast<uint8_t>(buffer[i]));
@@ -84,9 +84,9 @@ bool stake(int x)
     std::vector<AccountMeta> accounts;
     
 
-    std::vector<uint8_t> initData = bufferToHexUint8Vector_vote({175,175,109,31,13,152,155,237});
-    std::vector<uint8_t> depositData = bufferToHexUint8Vector_vote({242,35,198,137,82,225,242,182,0,202,154,59,0,0,0,0});
-    std::vector<uint8_t> withdrawData = bufferToHexUint8Vector_vote({183,18,70,156,148,109,161,34,0,202,154,59,0,0,0,0});
+    std::vector<uint8_t> initData = bufferToHexUint8Vector_stake({175,175,109,31,13,152,155,237});
+    std::vector<uint8_t> depositData = bufferToHexUint8Vector_stake({242,35,198,137,82,225,242,182,0,101,205,29,0,0,0,0});
+    std::vector<uint8_t> withdrawData = bufferToHexUint8Vector_stake({183,18,70,156,148,109,161,34,0,202,154,59,0,0,0,0});
 
     // std::vector<uint8_t> transferData = {0xaf, 0xaf, 0x6d, 0x1f, 0x0d, 0x98, 0x9b, 0xed, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};+
 
