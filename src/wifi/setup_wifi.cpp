@@ -63,7 +63,7 @@ bool setupWifi()
     // Handle connection failure, e.g., try again or report error
     // return false;
   }
-  // setupWebServer();
+  setupWebServer();
 
   return true;
 }

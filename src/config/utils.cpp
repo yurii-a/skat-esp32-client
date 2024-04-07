@@ -24,21 +24,35 @@ Keypair stringToKeypair(const std::string &encodedString)
   return keypair;
 }
 
-void stringToHexArray(const String& str, uint8_t* hexArray, int& size) {
+void stringToHexArray(const String &str, uint8_t *hexArray, int &size)
+{
   size = str.length();
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++)
+  {
     hexArray[i] = str.charAt(i);
   }
 }
 
-void reverseVector(std::vector<uint8_t>& vec) {
-    size_t left = 0;
-    size_t right = vec.size() - 1;
-    while (left < right) {
-        uint8_t temp = vec[left];
-        vec[left] = vec[right];
-        vec[right] = temp;
-        left++;
-        right--;
-    }
+void reverseVector(std::vector<uint8_t> &vec)
+{
+  size_t left = 0;
+  size_t right = vec.size() - 1;
+  while (left < right)
+  {
+    uint8_t temp = vec[left];
+    vec[left] = vec[right];
+    vec[right] = temp;
+    left++;
+    right--;
+  }
+}
+
+std::vector<uint8_t> bufferToHexUint8Vector(std::vector<uint8_t> buffer)
+{
+  std::vector<uint8_t> result;
+  for (size_t i = 0; i < buffer.size(); ++i)
+  {
+    result.push_back(static_cast<uint8_t>(buffer[i]));
+  }
+  return result;
 }

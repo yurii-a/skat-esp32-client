@@ -1,1 +1,3 @@
-bool vote_ix(int x);
+#include <Arduino.h>
+
+String voteIx(int x);

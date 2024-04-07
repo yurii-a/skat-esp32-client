@@ -15,11 +15,13 @@
 #include <SolanaSDK/programs/system_program.h>
 #include <SolanaSDK/transaction.h>
 #include <SolanaSDK/connection.h>
-// #include <nlohmann/json.hpp>
 
-bool anchor_ix()
+// 0 = stake
+// 1 = unstake
+
+String stakeIx(int x, uint64_t amount)
 {
-  const char *devnetRPC = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
+  const char *devnetRPC = "https://parental-ardenia-fast-devnet.helius-rpc.com/";
   const char *mainnetRPC = "https://cecily-q1u5dh-fast-mainnet.helius-rpc.com/";
 
   // Establish WiFi connection (code from previous snippet)
@@ -27,7 +29,6 @@ bool anchor_ix()
   // Make the REST API call
   if (WiFi.status() == WL_CONNECTED)
   {
-
     // http get request for ix data from frontend
 
     Connection connection = Connection(devnetRPC, Commitment::confirmed);
@@ -46,22 +47,47 @@ bool anchor_ix()
     Serial.print("PAYER: ");
     Serial.println(payer);
 
-    Keypair data = Keypair::generate();
-    Serial.print("DATA: ");
-    Serial.println(data.publicKey.toBase58().c_str());
+    PublicKey stakeAccount = PublicKey(Base58::trimDecode("Byr8ZpT4LT9mowoN8zePxn5mPgJw9vT6moUZz2UiuYZZ"));
 
     AccountMeta *payerAccountMeta = AccountMeta::newWritable(signer.publicKey(), true);
-    AccountMeta *dataAccountMeta = AccountMeta::newWritable(data.publicKey, true);
+    AccountMeta *stakeAccountMeta = AccountMeta::newWritable(stakeAccount, false);
+
     PublicKey systemProgramId = SystemProgram::id();
     AccountMeta *systemProgramAccountMeta = AccountMeta::newReadonly(systemProgramId, false);
 
-    std::vector<uint8_t> transferData = bufferToHexUint8Vector({175, 175, 109, 31, 13, 152, 155, 237, 45, 0, 0, 0, 0, 0, 0, 0});
+    std::vector<uint8_t> transferData;
+    std::vector<AccountMeta> accounts;
 
-    // std::vector<uint8_t> transferData = {0xaf, 0xaf, 0x6d, 0x1f, 0x0d, 0x98, 0x9b, 0xed, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};+
+    std::vector<uint8_t> stakeData = bufferToHexUint8Vector({206, 176, 202, 18, 200, 209, 179, 108});
+    std::vector<uint8_t> unstakeData = bufferToHexUint8Vector({90, 95, 107, 42, 205, 124, 50, 225});
 
-    std::vector<AccountMeta> accounts = {*dataAccountMeta, *payerAccountMeta, *systemProgramAccountMeta};
+    std::vector<AccountMeta> stakeAccounts = {*stakeAccountMeta, *payerAccountMeta, *systemProgramAccountMeta};
 
-    PublicKey axsProgramId = PublicKey(Base58::trimDecode("7xF5eBCgw8NHW5yzxuUHqXsN7csGfX9mxs35qpdeM817"));
+    if (x == 0)
+    {
+      transferData = stakeData;
+      accounts = stakeAccounts;
+    }
+    else if (x == 1)
+    {
+      transferData = unstakeData;
+      accounts = stakeAccounts;
+    }
+
+    // Convert amount to bytes and append to transferData
+    std::vector<uint8_t> amountBytes(sizeof(amount));
+    memcpy(amountBytes.data(), &amount, sizeof(amount));
+    transferData.insert(transferData.end(), amountBytes.begin(), amountBytes.end());
+
+    Serial.println("HEX DATA: ");
+    for (auto byte : transferData)
+    {
+      Serial.print(byte, HEX);
+      Serial.print(", ");
+    }
+    Serial.println(" ");
+
+    PublicKey stakeProgramId = PublicKey(Base58::trimDecode("3wWnXqbxVfpFRr1VgiwJykVZSqwJcqAwMKtoJ9N3YjRj"));
 
     std::vector<uint8_t> accountBytes;
     for (auto &account : accounts)
@@ -71,7 +97,7 @@ bool anchor_ix()
     }
 
     Instruction ix = Instruction::newWithBytes(
-        axsProgramId, transferData,
+        stakeProgramId, transferData,
         accounts);
 
     std::vector<uint8_t> transferIx = ix.serialize();
@@ -91,19 +117,18 @@ bool anchor_ix()
 
     std::vector<Signer> signerVector;
     signerVector.push_back(signer);
-    signerVector.push_back(data);
 
     Signers signers(signerVector);
 
     tx.sign(signers, recentBlockhash.blockhash);
 
-    std::vector<uint8_t> serializedTx = tx.serialize();
-
     Signature returnedSignature = connection.sendTransaction(tx);
 
     Serial.print("SIGNATURE: ");
     Serial.println(returnedSignature.toString().c_str());
+
+    return returnedSignature.toString().c_str();
   }
 
-  return true;
+  return "";
 }

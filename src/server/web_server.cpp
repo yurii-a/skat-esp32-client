@@ -1,6 +1,8 @@
 #include "web_server.h"
 #include "config/save_config.h"
 #include "client/anchor.h"
+#include "client/vote_ix.h"
+#include "client/stake_ix.h"
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/base58.h"
 #include "config/utils.h"
@@ -99,7 +101,14 @@ void handleSubmit()
   Serial.println("");
 
   saveConfig(ssid, password, privateKey);
-  ESP.restart();
+  StaticJsonDocument<128> response;
+  response["publicKey"] = keypair.publicKey.toBase58();
+
+  String responsePayload;
+  serializeJson(response, responsePayload);
+
+  axsServer.send(200, "application/json", responsePayload);
+  // ESP.restart();
 }
 
 void handleEdit()
@@ -194,10 +203,11 @@ void invokeAnchor()
   String data = axsServer.arg("name");
   uint8_t dataHex[data.length()];
   int dataHexSize;
-  
+
   stringToHexArray(data, dataHex, dataHexSize);
   Serial.print("data parameter value (hex): ");
-  for (int i = 0; i < dataHexSize; i++) {
+  for (int i = 0; i < dataHexSize; i++)
+  {
     Serial.print(dataHex[i], HEX);
     Serial.print(" ");
   }
@@ -207,6 +217,61 @@ void invokeAnchor()
   Serial.println(dataHexSize);
 
   String signature = anchor(data, dataHexSize);
+
+  StaticJsonDocument<128> response;
+  response["signature"] = signature;
+
+  String responsePayload;
+  serializeJson(response, responsePayload);
+
+  axsServer.send(200, "application/json", responsePayload);
+}
+
+void invokeVote()
+{
+  addCorsHeaders();
+  String data = axsServer.arg("cast");
+
+  int cast = atoi(data.c_str());
+
+  String signature;
+  if (cast == 0)
+  {
+    signature = voteIx(1);
+  }
+  else
+  {
+    signature = voteIx(2);
+  }
+
+  StaticJsonDocument<128> response;
+  response["signature"] = signature;
+
+  String responsePayload;
+  serializeJson(response, responsePayload);
+
+  axsServer.send(200, "application/json", responsePayload);
+}
+
+void invokeStake()
+{
+  addCorsHeaders();
+  String combinedParam = axsServer.arg("type");
+
+  String type = combinedParam.substring(0, combinedParam.indexOf('?'));
+  String amount = combinedParam.substring(combinedParam.indexOf('=') + 1);
+
+  uint8_t amountInt = atoi(amount.c_str());
+
+  String signature;
+  if (type == "stake")
+  {
+    signature = stakeIx(0, amountInt);
+  }
+  else
+  {
+    signature = stakeIx(1, amountInt);
+  }
 
   StaticJsonDocument<128> response;
   response["signature"] = signature;
@@ -261,21 +326,27 @@ void setupWebServer()
 
   getPrivateKey(configSecretKey);
 
-  if (configSecretKey.length() != 0) {
+  if (configSecretKey.length() != 0)
+  {
     Keypair keypair = stringToKeypair(configSecretKey.c_str());
     Serial.print("PUBLIC KEY: ");
     Serial.println(keypair.publicKey.toBase58().c_str());
   }
 
   // Start web server
-  if (configSecretKey.length() == 0) {
+  if (configSecretKey.length() == 0)
+  {
     axsServer.on("/", HTTP_GET, handleSetup);
-  } else {
+  }
+  else
+  {
     axsServer.on("/", HTTP_GET, handleEdit);
   }
   axsServer.on("/submit", HTTP_GET, handleSubmit);
   axsServer.on("/update", HTTP_GET, handleUpdate);
   axsServer.on("/anchor", HTTP_GET, invokeAnchor);
+  axsServer.on("/vote", HTTP_GET, invokeVote);
+  axsServer.on("/stake", HTTP_GET, invokeStake);
   axsServer.on("/reset", HTTP_GET, resetConfig);
   axsServer.on("/reset-wifi", HTTP_GET, resetWifiConfig);
   axsServer.on("/reset-wallet", HTTP_GET, resetWalletConfig);
