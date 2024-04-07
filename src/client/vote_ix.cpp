@@ -75,6 +75,14 @@ String voteIx(int x)
       accounts = vote_accounts;
     }
 
+    Serial.println("HEX DATA: ");
+    for (auto byte : transferData)
+    {
+      Serial.print(byte, HEX);
+      Serial.print(", ");
+    }
+    Serial.println(" ");
+
     PublicKey voteProgramId = PublicKey(Base58::trimDecode("8tLuLj11sZgqgfCrzpHAhS4QN8RZh8uknqmAyLKKMVow"));
 
     std::vector<uint8_t> accountBytes;
