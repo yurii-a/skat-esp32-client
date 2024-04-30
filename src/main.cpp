@@ -12,15 +12,26 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <qrcode.h>
+#include "client/pedometer.h"
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+// #define SCREEN_WIDTH 128 // OLED display width,  in pixels
+// #define SCREEN_HEIGHT 64 // OLED display height, in pixels
+// // declare an SSD1306 display object connected to I2C
+// Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup()
 {
   Serial.begin(115200);
-
   setupWifi();
+  oledsetup();
+  adxlsetup();
 }
 
 void loop()
 {
-  axsServer.handleClient();
+  // axsServer.handleClient();
+  step_count();
+
 }

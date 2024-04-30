@@ -18,8 +18,8 @@
 
 bool transferBonk()
 {
-  // const char *rpc = "https://kora-disz8d-fast-devnet.helius-rpc.com/";
-  const char *rpc = "https://relevant-lebbie-fast-mainnet.helius-rpc.com/";
+  const char *rpc = "https://api-devnet.helius.xyz";
+//   const char *rpc = "https://relevant-lebbie-fast-mainnet.helius-rpc.com/";
 
   // Establish WiFi connection (code from previous snippet)
 
@@ -51,25 +51,27 @@ bool transferBonk()
 
     // BqWi2aZYQRUk9ZGMD9Ti71bkVhngsg7SubiJ81Eznqoa
     // GxCJ5iHEbiNu3WYpaRdFrQde7oiRcg5PCSbJYjRq2XEy
-    PublicKey recipient = PublicKey(Base58::trimDecode("GxCJ5iHEbiNu3WYpaRdFrQde7oiRcg5PCSbJYjRq2XEy"));
+    PublicKey recipient = PublicKey(Base58::trimDecode("7Eh3n61XxkVYosxFBLUWDG6PJCeUMNz8L982n5cqzCUx"));
     Serial.print("RECIPIENT: ");
     Serial.println(recipient.toBase58().c_str());
 
     // BhUhTyLSR6B3zjXv7gCHEKSs8WQ8wX5BvKB4gPHxnAZU
     // 7n3bAL35wfH58iqaNx22qjnBqAC4dYaWwkxUVNPZZJoN
-    PublicKey sourceAta = PublicKey(Base58::trimDecode("7n3bAL35wfH58iqaNx22qjnBqAC4dYaWwkxUVNPZZJoN"));
+    // 7wxVFNuK35shzgrF1wjdrTmfkUd3SSkRCXrZqxYjQVDX
+    PublicKey sourceAta = PublicKey(Base58::trimDecode("CsmrdapyDmPkUjSbPtQkCwbcRDR5XyEaDoXoh2NP8RB5"));
     Serial.print("SOURCE ATA: ");
     Serial.println(sourceAta.toBase58().c_str());
 
     // GTSPJDQmYWKEz6mtfMcCJgCh42ac2Sxqg3BGMRM4GGzV
     // AYSwG6QVAJw8aCM8pcDYnAKCrfPtdjcY3v3ciBEmyjwJ
-    PublicKey recipientAta = PublicKey(Base58::trimDecode("AYSwG6QVAJw8aCM8pcDYnAKCrfPtdjcY3v3ciBEmyjwJ"));
+    // 7Eh3n61XxkVYosxFBLUWDG6PJCeUMNz8L982n5cqzCUx
+    PublicKey recipientAta = PublicKey(Base58::trimDecode("AKDpTf2AvT8gXGcW6HL5G3A6oBG2CAY7icbuAUfwpa7A"));
     Serial.print("RECIPIENT ATA: ");
     Serial.println(recipientAta.toBase58().c_str());
 
     // ERkzwkBkPeF1Q2LJr9Jqr2dcy4zZSV1pX6VGFxDmniM2
     // DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263
-    PublicKey mint = PublicKey(Base58::trimDecode("DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"));
+    PublicKey mint = PublicKey(Base58::trimDecode("ERkzwkBkPeF1Q2LJr9Jqr2dcy4zZSV1pX6VGFxDmniM2"));
     Serial.print("MINT: ");
     Serial.println(mint.toBase58().c_str());
 
@@ -84,7 +86,7 @@ bool transferBonk()
     // std::vector<uint8_t> transferData = {
     //     0x0c, 0x80, 0x96, 0x98, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06};
     std::vector<uint8_t> transferData = {
-        0x0c, 0x40, 0x42, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05};
+        0x0c, 0x00, 0xe4, 0x0b, 0x54, 0x02, 0x00, 0x00, 0x00, 0x06};
 
     std::vector<uint8_t> computeBudgetData = {
         0x03,
@@ -159,7 +161,7 @@ bool transferBonk()
     Serial.print("SIGNATURE: ");
     Serial.println(returnedSignature.toString().c_str());
 
-    Serial.println("LOST BONK");
+    Serial.println("10,000 BONK Burned!!!!");
 
     http.end();
   }
