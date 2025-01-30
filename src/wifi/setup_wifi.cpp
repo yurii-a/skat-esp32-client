@@ -33,7 +33,7 @@ bool setupWifi()
   Serial.println("\n");
 
   Serial.println("\n\n----- WiFi Setup -----");
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid.c_str(), password.c_str());
 
   unsigned long startAttemptTime = millis();
 
