@@ -26,12 +26,12 @@ void setup()
   Serial.begin(115200);
   setupWifi();
   oledsetup();
-  adxlsetup();
+  // adxlsetup();
 }
 
 void loop()
 {
-  // axsServer.handleClient();
-  step_count();
+  axsServer.handleClient();
+  // step_count();
 
 }
