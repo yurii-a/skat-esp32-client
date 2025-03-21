@@ -4,7 +4,8 @@
 #include "wifi/setup_wifi.h"
 #include "client/transfer.h"
 #include "client/anchor.h"
-#include "client/bonk.h"
+// #include "client/bonk.h"
+#include "client/skat.h"
 #include "client/helius.h"
 #include "SolanaSDK/keypair.h"
 #include "server/web_server.h"
@@ -32,6 +33,7 @@ void setup()
 void loop()
 {
   axsServer.handleClient();
+  sendBid();
   // step_count();
 
 }

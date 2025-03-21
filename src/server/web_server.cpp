@@ -1,6 +1,7 @@
 #include "web_server.h"
 #include "config/save_config.h"
 #include "client/anchor.h"
+#include "client/skat.h"
 #include "client/vote_ix.h"
 #include "client/stake_ix.h"
 #include "SolanaSDK/keypair.h"
@@ -350,6 +351,8 @@ void setupWebServer()
   axsServer.on("/reset", HTTP_GET, resetConfig);
   axsServer.on("/reset-wifi", HTTP_GET, resetWifiConfig);
   axsServer.on("/reset-wallet", HTTP_GET, resetWalletConfig);
+  axsServer.on("/sendBid", HTTP_GET, sendBid);
+
   axsServer.begin();
   Serial.println("Web server started");
 }
