@@ -1,0 +1,3 @@
+#include <string>
+
+String sendBid();
