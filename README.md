@@ -1,6 +1,21 @@
-# Project Configuration for NodeMCU-32S
 
-This project is configured to use PlatformIO for development with the NodeMCU-32S board, which is based on the ESP32 microcontroller. The `platformio.ini` file contains various settings and dependencies required for building and uploading the firmware.
+# ESP32 client for Solana DePIN applications
+## Ultimate goal of Skat Energy
+At Skat Energy, we believe in electricity network where energy can be traded freely, cheaper and with limited need of government intervention. 
+Trading electricity should be as seamless as sending text on Whatsapp or renewing Youtube subsciption.
+Moreover, decreasing cost of renewables brings billions of prosumers to the market and we think we have the right solution for them to join the market. 
+
+## On Esp32 client
+The main objective is to showcase how to send Solana transactions in C++ from an ESP32 microcontroller. This functionality can be utilized for various Decentralized Physical Infrastructure Networks (DePIN) applications, enabling secure and efficient interactions with the Solana blockchain.
+
+Currently the footprint of Rust Solana SDK in bigger than 20MB which is beyond esp32 16MB constrains. Alternatives are more espensive like Raspberry Pi 4 2GB or Raspberry Zero 2W which limits the speed of worldwide DEPINization :)
+
+This is still a work in progress with following backlog:
+- [ ] Add tests to ensure that Solana transactions are called correctly
+- [ ] Add a WebSocker listener to account state changes on Solana in order to turn on or off the hardware
+- [ ] Show hardware state in frontend
+- [ ] Show hardware state on eInk screen
+- [ ] Offload frontend to CDN if needed
 
 ## Configuration Details
 
@@ -15,25 +30,6 @@ This project is configured to use PlatformIO for development with the NodeMCU-32
 
 - **Framework**: `arduino`
   - This specifies that the Arduino framework is being used for development.
-
-### Build Flags
-
-- **build_unflags**: `-std=gnu++11`
-  - This unflags the GNU++11 standard.
-- **build_flags**: `-std=gnu++17`
-  - This sets the C++ standard to GNU++17.
-- **debug_build_flags**: `-Os`
-  - This sets the optimization level for debugging to `-Os` (optimize for size).
-
-### Build Type
-
-- **build_type**: `debug`
-  - This sets the build type to debug, which includes debugging information in the compiled firmware.
-
-### Monitor Filters
-
-- **monitor_filters**: `esp32_exception_decoder`
-  - This enables the ESP32 exception decoder filter for the serial monitor, which helps in decoding exceptions and stack traces.
 
 ### Library Dependencies
 
