@@ -8,9 +8,11 @@ Moreover, decreasing cost of renewables brings billions of prosumers to the mark
 ## On Esp32 client
 The main objective is to showcase how to send Solana transactions in C++ from an ESP32 microcontroller. This functionality can be utilized for various Decentralized Physical Infrastructure Networks (DePIN) applications, enabling secure and efficient interactions with the Solana blockchain.
 
+## Your choice of hardware
 Currently the footprint of Rust Solana SDK in bigger than 20MB which is beyond esp32 16MB constrains. Alternatives are more espensive like Raspberry Pi 4 2GB or Raspberry Zero 2W which limits the speed of worldwide DEPINization :)
+This client is light-weight comparing to Solana SDK and a good place to start a DePIN journey. 
 
-This is still a work in progress with following backlog:
+## This is still a work in progress with following backlog:
 - [ ] Add tests to ensure that Solana transactions are called correctly
 - [ ] Add a WebSocker listener to account state changes on Solana in order to turn on or off the hardware
 - [ ] Show hardware state in frontend
