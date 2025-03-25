@@ -4,7 +4,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
-extern WebServer axsServer;
+extern WebServer server;
 
 void setupWebServer();
 

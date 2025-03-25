@@ -7,17 +7,18 @@
 #include "SolanaSDK/keypair.h"
 #include "SolanaSDK/base58.h"
 #include "config/utils.h"
+#include <Update.h> // Include the Update library for OTA updates
 
-WebServer axsServer(80);
+WebServer server(80);
 
-const char *softAP_ssid = "PROJECT-AXS";
-const char *softAP_password = "axssolana";
+const char *softAP_ssid = "Magic Gadget";
+const char *softAP_password = "1234567890";
 
 void addCorsHeaders()
 {
-  axsServer.sendHeader("Access-Control-Allow-Origin", "*");
-  axsServer.sendHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-  axsServer.sendHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  server.sendHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 }
 
 void handleSetup()
@@ -27,7 +28,7 @@ void handleSetup()
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>AXS Dashboard</title>
+<title>Connect to Wifi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
@@ -55,11 +56,12 @@ input[type='submit'] {
 </style>
 </head>
 <body>
-<h1>AXS Dashboard</h1>
+<h1>Let's get started</h1>
+<h2>Enter WiFi details to connect your device to Internet</h2>
 <form id="configForm">
   SSID: <input type='text' id='ssid' name='ssid'><br>
   Password: <input type='password' id='password' name='password'><br>
-  <input type='submit' value='Submit'>
+  <input type='submit' value='Confirm & Continue'>
 </form>
 <script>
 document.getElementById('configForm').addEventListener('submit', function(event) {
@@ -82,14 +84,14 @@ document.getElementById('configForm').addEventListener('submit', function(event)
 </body>
 </html>)rawliteral";
 
-  axsServer.send(200, "text/html", html);
+  server.send(200, "text/html", html);
 }
 
 void handleSubmit()
 {
   addCorsHeaders();
-  String ssid = axsServer.arg("ssid");
-  String password = axsServer.arg("password");
+  String ssid = server.arg("ssid");
+  String password = server.arg("password");
 
   Serial.print("SSID: ");
   Serial.println(ssid);
@@ -97,9 +99,8 @@ void handleSubmit()
   Keypair keypair = Keypair::generate();
   String privateKey = keypairToString(keypair).c_str();
 
-  Serial.print("PUBLIC_KEY: ");
-  Serial.print(keypair.publicKey.toBase58().c_str());
-  Serial.println("");
+  Serial.print("The Solana keypair is initialized: ");
+  Serial.println(keypair.publicKey.toBase58().c_str());
 
   saveConfig(ssid, password, privateKey);
   StaticJsonDocument<128> response;
@@ -108,7 +109,7 @@ void handleSubmit()
   String responsePayload;
   serializeJson(response, responsePayload);
 
-  axsServer.send(200, "application/json", responsePayload);
+  server.send(200, "application/json", responsePayload);
   // ESP.restart();
 }
 
@@ -174,14 +175,14 @@ document.getElementById('configForm').addEventListener('submit', function(event)
 </body>
 </html>)rawliteral";
 
-  axsServer.send(200, "text/html", html);
+  server.send(200, "text/html", html);
 }
 
 void handleUpdate()
 {
   addCorsHeaders();
-  String ssid = axsServer.arg("ssid");
-  String password = axsServer.arg("password");
+  String ssid = server.arg("ssid");
+  String password = server.arg("password");
 
   Serial.print("SSID: ");
   Serial.println(ssid);
@@ -201,7 +202,7 @@ void handleUpdate()
 void invokeAnchor()
 {
   addCorsHeaders();
-  String data = axsServer.arg("name");
+  String data = server.arg("name");
   uint8_t dataHex[data.length()];
   int dataHexSize;
 
@@ -225,13 +226,44 @@ void invokeAnchor()
   String responsePayload;
   serializeJson(response, responsePayload);
 
-  axsServer.send(200, "application/json", responsePayload);
+  server.send(200, "application/json", responsePayload);
 }
+
+void invokeSendBid()
+{
+  addCorsHeaders();
+  String data = "";//axsServer.arg("name");
+  uint8_t dataHex[data.length()];
+  int dataHexSize;
+
+  stringToHexArray(data, dataHex, dataHexSize);
+  Serial.print("data parameter value (hex): ");
+  for (int i = 0; i < dataHexSize; i++)
+  {
+    Serial.print(dataHex[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
+
+  Serial.print("Size of dataHex array: ");
+  Serial.println(dataHexSize);
+
+  String signature = anchor(data, dataHexSize);
+
+  StaticJsonDocument<128> response;
+  response["signature"] = signature;
+
+  String responsePayload;
+  serializeJson(response, responsePayload);
+
+  server.send(200, "application/json", responsePayload);
+}
+
 
 void invokeVote()
 {
   addCorsHeaders();
-  String data = axsServer.arg("cast");
+  String data = server.arg("cast");
 
   int cast = atoi(data.c_str());
 
@@ -251,13 +283,13 @@ void invokeVote()
   String responsePayload;
   serializeJson(response, responsePayload);
 
-  axsServer.send(200, "application/json", responsePayload);
+  server.send(200, "application/json", responsePayload);
 }
 
 void invokeStake()
 {
   addCorsHeaders();
-  String combinedParam = axsServer.arg("type");
+  String combinedParam = server.arg("type");
 
   String type = combinedParam.substring(0, combinedParam.indexOf('?'));
   String amount = combinedParam.substring(combinedParam.indexOf('=') + 1);
@@ -280,7 +312,7 @@ void invokeStake()
   String responsePayload;
   serializeJson(response, responsePayload);
 
-  axsServer.send(200, "application/json", responsePayload);
+  server.send(200, "application/json", responsePayload);
 }
 
 void resetConfig()
@@ -288,14 +320,14 @@ void resetConfig()
   Serial.println("RESETTING WIFI CONFIG & PRIVATE KEY");
   addCorsHeaders();
   saveConfig("", "", "");
-  axsServer.send(200, "application/json", "Reset successfully!");
+  server.send(200, "application/json", "Reset successfully!");
 }
 
 void resetWifiConfig()
 {
   addCorsHeaders();
   saveWifiConfig("", "");
-  axsServer.send(200, "application/json", "Wifi reset successfully!");
+  server.send(200, "application/json", "Wifi reset successfully!");
 }
 
 void resetWalletConfig()
@@ -312,7 +344,7 @@ void resetWalletConfig()
 
   savePrivateKey(privateKey);
 
-  axsServer.send(200, "application/json", "Wallet reset successfully!");
+  server.send(200, "application/json", "Wallet reset successfully!");
 }
 
 void setupWebServer()
@@ -327,32 +359,30 @@ void setupWebServer()
 
   getPrivateKey(configSecretKey);
 
-  if (configSecretKey.length() != 0)
+  bool isServerSetup = configSecretKey.length() == 0;
+
+  // Start web server
+  if (!isServerSetup)
   {
+    server.on("/", HTTP_GET, handleSetup);
     Keypair keypair = stringToKeypair(configSecretKey.c_str());
     Serial.print("PUBLIC KEY: ");
     Serial.println(keypair.publicKey.toBase58().c_str());
   }
-
-  // Start web server
-  if (configSecretKey.length() == 0)
-  {
-    axsServer.on("/", HTTP_GET, handleSetup);
-  }
   else
   {
-    axsServer.on("/", HTTP_GET, handleEdit);
+    server.on("/", HTTP_GET, handleEdit);
   }
-  axsServer.on("/submit", HTTP_GET, handleSubmit);
-  axsServer.on("/update", HTTP_GET, handleUpdate);
-  axsServer.on("/anchor", HTTP_GET, invokeAnchor);
-  axsServer.on("/vote", HTTP_GET, invokeVote);
-  axsServer.on("/stake", HTTP_GET, invokeStake);
-  axsServer.on("/reset", HTTP_GET, resetConfig);
-  axsServer.on("/reset-wifi", HTTP_GET, resetWifiConfig);
-  axsServer.on("/reset-wallet", HTTP_GET, resetWalletConfig);
-  axsServer.on("/sendBid", HTTP_GET, sendBid);
+  server.on("/submit", HTTP_GET, handleSubmit);
+  server.on("/update", HTTP_GET, handleUpdate);
+  server.on("/anchor", HTTP_GET, invokeAnchor);
+  server.on("/vote", HTTP_GET, invokeVote);
+  server.on("/stake", HTTP_GET, invokeStake);
+  server.on("/reset", HTTP_GET, resetConfig);
+  server.on("/reset-wifi", HTTP_GET, resetWifiConfig);
+  server.on("/reset-wallet", HTTP_GET, resetWalletConfig);
+  server.on("/sendBid", HTTP_GET, invokeSendBid);
 
-  axsServer.begin();
+  server.begin();
   Serial.println("Web server started");
 }

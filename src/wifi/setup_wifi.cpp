@@ -20,18 +20,6 @@ bool setupWifi()
 
   getWifiConfig(ssid, password);
   Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-  Serial.println("\n");
-
   Serial.println("\n\n----- WiFi Setup -----");
   WiFi.begin(ssid.c_str(), password.c_str());
 
